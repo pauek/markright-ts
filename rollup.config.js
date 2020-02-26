@@ -8,7 +8,7 @@ export default [
 	{
 		input: 'src/markright.ts',
 		output: {
-			name: 'howLongUntilLunch',
+			name: 'markright',
 			file: pkg.browser,
 			format: 'umd'
 		},
