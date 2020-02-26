@@ -1,7 +1,7 @@
 import { Item, Text, Block, Line, BlockCommand, InlineCommand } from './model'
 import { splitLines } from './utils'
 
-const stringify = (mr: Item) => {
+export const stringify = (mr: Item) => {
   let indent: number = 0
   let line: string = ''
   let result: string = ''
@@ -81,8 +81,4 @@ const stringify = (mr: Item) => {
     result += line + '\n'
   }
   return result
-}
-
-module.exports = {
-  stringify
 }

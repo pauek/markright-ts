@@ -9,6 +9,8 @@ import {
   InlineCommand
 } from "./model";
 
+import { stringify } from './stringify';
+
 // Delimiters
 
 const commandChar = "@";
@@ -361,6 +363,6 @@ export const parse = (str: string, funcMap: Record<string, Function>) =>
 export const parseRecur = (str: string, funcMap: Record<string, Function>) =>
   new Parser({ funcMap, recur: true }).parse(str);
 
-export const { stringify } = require("./stringify");
+export { stringify };
 
 export { Item, Text, Block, Command, Line, BlockCommand, InlineCommand };
