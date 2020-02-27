@@ -109,7 +109,7 @@ export class Command extends Item {
     if (this.children) {
       if (this.children instanceof _List) {
         if (this.children.hasChildren()) {
-          json += `,"children":${this.children.toJson()}`;  
+          json += `,"children":${this.children.toJson()}`;
         }
       } else {
         json += `,"children":${this.children.toJson()}`;
@@ -142,8 +142,5 @@ export class InlineCommand extends Command {
     super(name, args);
     if (rawChildren) this.rawChildren = rawChildren;
     if (delim) this.delim = delim;
-  }
-  toInlineCommand() {
-    return this;
   }
 }

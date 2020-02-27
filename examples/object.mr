@@ -1,0 +1,13 @@
+@person
+  @code{007}
+  @name
+    @first{James}
+    @last{Bond}
+  @age(int){27}
+  @friend
+    @name{M}
+    @age(int){52}
+    @is-friend
+    @boss(bool){false}
+  @height(double){170.5}
+  @notMarried

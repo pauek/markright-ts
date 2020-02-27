@@ -9,7 +9,7 @@ import {
   InlineCommand
 } from "./model";
 
-import { stringify } from './stringify';
+import { stringify } from "./stringify";
 
 // Delimiters
 
@@ -272,11 +272,14 @@ class Parser {
     let pendingEmptyLine = false;
 
     const push = (item: Item) => {
-      if (item instanceof BlockCommand && item.rawChildren === '') {
-        item = item.toInlineCommand()
+      if (item instanceof BlockCommand && item.rawChildren === "") {
+        const newitem = item.toInlineCommand();
+        // Why do I need to do this???
+        delete newitem.rawChildren; // FIXME FIXME FIXME
+        item = newitem;
       }
       itemList.push(this.execute(item));
-    }
+    };
     const pushEmptyLine = () => push(new Line());
 
     for (let i = 0; i < lines.length; i++) {
