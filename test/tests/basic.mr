@@ -23,11 +23,26 @@
   @input{@something}
   @output{@something}
 
-@parse-test(three inline commands)
+@parse-test(three inline commands <1>)
   @input
     @a@b@c
   @output
     Block(Line(@a@b@c))
+  
+@parse-test(three inline commands <2>)
+  @input
+    @a
+    @b
+    @c
+  @output
+    Block(@a@b@c)
+
+@parse-test(three inline commands <3>)
+  @input
+    @a@b
+    @c
+  @output
+    Block(Line(@a@b)@c)
 
 @parse-test(spaces between inline commands)
   @input{@a  @b@c}
