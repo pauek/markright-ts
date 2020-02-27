@@ -44,6 +44,14 @@
   @output
     Block(Line(@a@b)@c)
 
+@parse-test(three inline commands <4>)
+  @input
+    @a@b
+    @c
+    @d@e
+  @output
+    Block(Line(@a@b)@cLine(@d@e))
+
 @parse-test(spaces between inline commands)
   @input{@a  @b@c}
   @output{Line(@a  @b@c)}
