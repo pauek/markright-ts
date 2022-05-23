@@ -1,7 +1,7 @@
-const markright = require("../dist/markright");
-const fs = require("fs");
+import { readFileSync } from 'fs';
+import markright from '../dist/markright';
 
-const text = fs.readFileSync("object.mr").toString();
+const text = readFileSync("object.mr").toString();
 
 const object = ({ rawChildren }) => {
   let result = {};

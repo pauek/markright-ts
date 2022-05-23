@@ -1,146 +1,116 @@
-export class Item {
-  rawChildren: string = "";
+/*
 
-  addRaw(str: string) {
-    if (this.rawChildren === undefined) {
-      this.rawChildren = "";
+Item
+InlineItem : Item
+BlockItem : Item
+
+Container {
+  children: []Item
+}
+Text : InlineItem {
+  text: string
+}
+Paragraph : Container {
+  children: []InlineItem
+} 
+Element : Container {
+  name, args: string
+}
+InlineElement : Element, InlineItem {
+  children: []InlineItem
+}
+BlockElement : Element, BlockItem {
+  children: []BlockItem
+}
+
+*/
+
+export type BlockItem = BlockElement | Paragraph;
+export type InlineItem = InlineElement | Text;
+export type Item = BlockItem | InlineItem;
+
+export abstract class Container {
+  children: Item[] | string | null = null;
+
+  childrenToString(ind: string, sep: string): string {
+    if (Array.isArray(this.children)) {
+      return `${this.children.map((it) => it.toString(ind)).join(sep)}`;
+    } else {
+      return `"${this.children}"`;
     }
-    this.rawChildren += str + "\n";
-  }
-  hasRawChildren() {
-    return this.rawChildren !== undefined;
-  }
-
-  toJson() {
-    throw new Error(`Item.toJson is abstract! (obj = ${JSON.stringify(this)})`);
   }
 }
 
-export class Text extends Item {
-  text: any;
+export class Text {
+  text: string = "";
 
   constructor(text: string) {
-    super();
     this.text = text;
   }
-  toJson() {
-    return `"${this.text}"`;
+
+  toString(ind: string) {
+    return `${ind}"${this.text}"`;
   }
 }
 
-class _List extends Item {
-  children?: Item[];
+export class Paragraph extends Container {
+  children: InlineItem[];
 
-  constructor(children?: Item[]) {
+  constructor(children: InlineItem[] = []) {
     super();
-    if (children) this.children = children;
+    this.children = children;
   }
-  hasChildren() {
-    return this.children ? this.children.length > 0 : false;
-  }
-  toJson() {
-    return `[${
-      this.children ? this.children.map(x => x.toJson()).join(",") : ""
-    }]`;
-  }
-  add(item: Item) {
-    this.children = [...(this.children || []), item];
+
+  toString(ind: string) {
+    return `${ind}Paragraph(\n${this.childrenToString(ind + "  ", "\n")}\n${ind})`;
   }
 }
 
-export class Block extends _List {}
+type ElementArgs = string[] | null;
+export class Element extends Container {
+  name: string = "";
+  args?: ElementArgs;
 
-export class Line extends _List {
-  // = List<InlineItem>
-
-  isSingle() {
-    return this.children && this.children.length === 1;
-  }
-  isSingleCommand() {
-    return (
-      this.isSingle() && this.children && this.children[0] instanceof Command
-    );
-  }
-  isSingleBlockCommand() {
-    return (
-      this.isSingle() &&
-      this.children &&
-      this.children[0] instanceof BlockCommand
-    );
-  }
-
-  allCommandsToInlineCommands() {
-    if (this.children) {
-      this.children = this.children.map(item => {
-        return item instanceof Command ? item.toInlineCommand() : item;
-      });
-    }
-  }
-
-  executeAllCommands(execFunc: Function) {
-    if (this.children) {
-      this.children = this.children.map(item => {
-        return item instanceof Command ? execFunc(item) : item;
-      });
-    }
-  }
-}
-
-export class Command extends Item {
-  name: string;
-  args: string[] | null;
-  delim?: {
-    open: string;
-    close: string;
-  };
-  children?: Item;
-
-  constructor(name: string, args: string[] | null) {
+  constructor(name: string, args?: ElementArgs) {
     super();
     this.name = name;
-    this.args = args;
-  }
-  toJson() {
-    let json = `{"cmd":"${this.name}"`;
-    if (this.args)
-      json += `,"args":[${this.args.map(x => `"${x}"`).join(",")}]`;
-    if (this.delim)
-      json += `,"delim":{"open":"${this.delim.open}","close":"${this.delim.close}"}`;
-    if (this.children) {
-      if (this.children instanceof _List) {
-        if (this.children.hasChildren()) {
-          json += `,"children":${this.children.toJson()}`;
-        }
-      } else {
-        json += `,"children":${this.children.toJson()}`;
-      }
+    if (args) {
+      this.args = args;
     }
-    json += `}`;
-    return json;
   }
-  toInlineCommand() {
-    return new InlineCommand(this.name, this.args);
-  }
-  toBlockCommand() {
-    return new BlockCommand(this.name, this.args);
+
+  toString(ind: string = ""): string {
+    const args = this.args ? `(${this.args.join(", ")})` : "";
+    return `${this.name}${args}`;
   }
 }
+export class BlockElement extends Element {
+  children: BlockItem[] | string = [];
 
-export class BlockCommand extends Command {
-  constructor(name: string, args: string[] | null) {
+  constructor(name: string, args: ElementArgs, children: BlockItem[] | string) {
     super(name, args);
+    this.children = children;
+  }
+
+  toString(ind: string): string {
+    return `${ind}BlockElement{${super.toString()}}\n${this.childrenToString(ind + "  ", "\n")}`;
   }
 }
+export class InlineElement extends Element {
+  children: InlineItem[] | string | null = [];
 
-export class InlineCommand extends Command {
-  constructor(
-    name: string,
-    args: string[] | null,
-    rawChildren?: string,
-    delim?: { open: string; close: string }
-  ) {
+  constructor(name: string, args: ElementArgs, children: InlineItem[] | string) {
     super(name, args);
-    if (rawChildren) this.rawChildren = rawChildren;
-    if (delim) this.delim = delim;
+    this.children = children;
+  }
+
+  toString(ind: string): any {
+    let children = "";
+    if (typeof this.children === "string") {
+      children = `"${this.children}"`;
+    } else if (Array.isArray(this.children) && this.children.length > 0) {
+      children = `[${this.childrenToString("", ", ")}]`;
+    }
+    return `${ind}InlineElement{${super.toString()}}${children}`;
   }
 }

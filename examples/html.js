@@ -1,5 +1,5 @@
-const fs = require('fs');
-const { parse } = require('../dist/markright');
+import { readFileSync } from 'fs';
+import { parse } from '../dist/markright';
 
 const splitLines = (str) => {
   if (typeof str !== 'string') {
@@ -136,6 +136,6 @@ class HtmlFuncMap {
 }
 
 const genHtml = (str) => parse(str, new HtmlFuncMap())
-const html = genHtml(fs.readFileSync('html.mr').toString())
+const html = genHtml(readFileSync('html.mr').toString())
 
 console.log(html)

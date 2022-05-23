@@ -1,29 +1,29 @@
 {
   "name": "markright",
   "version": "0.0.1",
-  "main": "dist/markright.js",
+  "main": "test/test.js",
+  "type": "module",
   "module": "dist/markright.esm.js",
   "browser": "dist/markright.umd.js",
   "devDependencies": {
-    "rollup": "^1.31.1",
-    "rollup-plugin-commonjs": "^9.3.4",
-    "rollup-plugin-node-resolve": "^4.2.4",
-    "rollup-plugin-typescript": "^1.0.1",
-    "ts-node": "^7.0.1",
-    "tslib": "^1.11.0",
-    "typescript": "^3.8.2"
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.3.2",
+    "rollup": "^2.74.1",
+    "ts-node": "^10.8.0",
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.4"
   },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "ts-node test/test.ts",
+    "test": "node test/test.js",
     "pretest": "npm run build"
   },
   "files": [
     "dist"
   ],
   "dependencies": {
-    "@types/colors": "^1.2.1",
-    "colors": "^1.4.0"
+    "colors.ts": "^1.0.20"
   }
 }
