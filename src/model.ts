@@ -62,7 +62,7 @@ export class Paragraph extends Container {
   }
 
   toString(ind: string) {
-    return `${ind}Paragraph(\n${this.childrenToString(ind + "  ", "\n")}\n${ind})`;
+    return `${ind}P\n${this.childrenToString(ind + "  ", "\n")}`;
   }
 }
 
@@ -93,7 +93,7 @@ export class BlockElement extends Element {
   }
 
   toString(ind: string): string {
-    return `${ind}BlockElement{${super.toString()}}\n${this.childrenToString(ind + "  ", "\n")}`;
+    return `${ind}B.${super.toString()}\n${this.childrenToString(ind + "  ", "\n")}`;
   }
 }
 export class InlineElement extends Element {
@@ -111,6 +111,6 @@ export class InlineElement extends Element {
     } else if (Array.isArray(this.children) && this.children.length > 0) {
       children = `[${this.childrenToString("", ", ")}]`;
     }
-    return `${ind}InlineElement{${super.toString()}}${children}`;
+    return `${ind}I.${super.toString()}${children}`;
   }
 }

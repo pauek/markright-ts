@@ -115,7 +115,7 @@ const parseElementBody = (
   const closeDelim = matchDelim(openCh).repeat(width);
   let end = line.indexOf(closeDelim, start);
   if (end === -1) {
-    throw new Error(`Expected '${closeDelim}' before line end`);
+    throw new Error(`Expected '${closeDelim}' at line "${line}"`);
   }
   i = end + width;
   return {
@@ -134,6 +134,8 @@ class Parser {
     this.curr = 0;
   }
 
+  // FIXME: Naïve con el rollo de los delimitadores!!!
+  // Estamos como en C con el /* /* */ */!!!
   parseLine(line: string): InlineItem[] {
     let items: InlineItem[] = [];
     let text: Text = new Text("");
@@ -186,15 +188,19 @@ class Parser {
     const children: BlockItem[] = element.children as BlockItem[];
     let paragraph: Paragraph | null = null;
 
+    const maybeEndParagraph = () => {
+      if (paragraph) {
+        children.push(paragraph);
+        paragraph = null;
+      }
+    }
+
     while (this.curr < this.lines.length) {
       const line = this.lines[this.curr];
       const nextLine = this.curr + 1 < this.lines.length ? this.lines[this.curr + 1] : null;
 
       if (isEmptyLine(line)) {
-        if (paragraph !== null) {
-          children.push(paragraph);
-          paragraph = null;
-        }
+        maybeEndParagraph();
         this.curr++;
         continue;
       }
@@ -204,11 +210,15 @@ class Parser {
         break;
       }
 
-      const atElement = line.text[0] === elementStartChar;
+      const atElement = line.text[0] === elementStartChar && line.indent == baseIndent;
       const atBlockElement = atElement && nextLine && nextLine.indent > line.indent;
 
       if (atBlockElement) {
-        assert(nextLine.indent === line.indent + 1, "Illegal indent increment!");
+        maybeEndParagraph();
+        assert(
+          nextLine.indent === line.indent + 1,
+          `Illegal indent increment! (line ${this.curr})`
+        );
         const { name, args } = parseElementHead(line.text);
         this.curr++;
         if (isRawElement(name)) {
@@ -223,9 +233,7 @@ class Parser {
         this.curr++;
       }
     }
-    if (paragraph !== null) {
-      children.push(paragraph);
-    }
+    maybeEndParagraph();
     return element;
   }
 }
