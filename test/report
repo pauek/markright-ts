@@ -1,0 +1,13 @@
+
+> markright@0.0.1 pretest
+> npm run build
+
+
+> markright@0.0.1 build
+> rollup -c
+
+
+> markright@0.0.1 test
+> node ./dist/test.js
+
+parse.mr: .....................

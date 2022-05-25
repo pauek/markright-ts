@@ -1,4 +1,5 @@
 import { Text, Paragraph, InlineItem, InlineElement, BlockElement, BlockItem } from "./model";
+import Printer from "./printer";
 
 const elementStartChar = "@";
 const openDelimiters = "[{(<";
@@ -15,7 +16,14 @@ const isEmptyLine = (line: Line) => line.text === "" && line.indent === 0;
 const isAllSpaces = (line: string) => line === " ".repeat(line.length);
 const isDelimiter = (ch: string) => allDelimiters.indexOf(ch) !== -1;
 const isOpenDelim = (ch: string) => openDelimiters.indexOf(ch) !== -1;
-const isRawElement = (name: string) => name[name.length - 1] === "*";
+
+const isRawElement = (name: string) => {
+  if (name[name.length - 1] === "*") {
+    return { isRaw: true, cleanName: name.slice(0, -1) };
+  } else {
+    return { isRaw: false, cleanName: name };
+  }
+}
 
 const matchDelim = (delim: string): string => closeDelimiters[openDelimiters.indexOf(delim)];
 
@@ -148,8 +156,12 @@ class Parser {
         }
         const { name, args, pos: i2 } = parseElementHead(line, i);
         const { body, pos: i3 } = parseElementBody(line, i2);
-        const children = isRawElement(name) ? body : this.parseLine(body);
-        items.push(new InlineElement(name, args, children));
+        const { cleanName, isRaw } = isRawElement(name);
+
+        const inlineElement = new InlineElement(cleanName, args, isRaw);
+        inlineElement.children = isRaw ? body : this.parseLine(body);
+        items.push(inlineElement);
+
         i = i3;
       } else {
         text.text += line[i];
@@ -162,30 +174,37 @@ class Parser {
     return items;
   }
 
-  parseRawBlock(baseIndent: number, name: string, args: string[] | null = null): BlockElement {
-    const element = new BlockElement(name, args, "");
+  parseBlockRawText(baseIndent: number, name: string, args: string[] | null = null): string {
+    let result: string = "";
+    let pendingEndl: boolean = false;
     while (this.curr < this.lines.length) {
       const line = this.lines[this.curr];
       if (isEmptyLine(line)) {
-        element.children += "\n";
+        if (pendingEndl) {
+          result += '\n';
+        }
+        pendingEndl = true;
         this.curr++;
         continue;
       }
       if (line.indent < baseIndent) {
         break;
       }
+      if (pendingEndl) {
+        result += '\n';
+        pendingEndl = false;
+      }
       if (line.indent > baseIndent) {
         line.text = "  ".repeat(line.indent - baseIndent) + line.text;
       }
-      element.children += `${line.text}\n`;
+      result += `${line.text}\n`;
       this.curr++;
     }
-    return element;
+    return result;
   }
 
-  parseBlock(baseIndent: number, name: string, args: string[] | null = null): BlockElement {
-    const element = new BlockElement(name, args, []);
-    const children: BlockItem[] = element.children as BlockItem[];
+  parseBlockItems(baseIndent: number): BlockItem[] {
+    const children: BlockItem[] = [];
     let paragraph: Paragraph | null = null;
 
     const maybeEndParagraph = () => {
@@ -193,7 +212,7 @@ class Parser {
         children.push(paragraph);
         paragraph = null;
       }
-    }
+    };
 
     while (this.curr < this.lines.length) {
       const line = this.lines[this.curr];
@@ -215,16 +234,17 @@ class Parser {
 
       if (atBlockElement) {
         maybeEndParagraph();
-        assert(
-          nextLine.indent === line.indent + 1,
-          `Illegal indent increment! (line ${this.curr})`
-        );
         const { name, args } = parseElementHead(line.text);
         this.curr++;
-        if (isRawElement(name)) {
-          children.push(this.parseRawBlock(line.indent + 1, name, args));
+        const { isRaw, cleanName } = isRawElement(name);
+        if (isRaw) {
+          const blockRawElement = new BlockElement(cleanName, args, true);
+          blockRawElement.children = this.parseBlockRawText(line.indent + 1, cleanName, args);
+          children.push(blockRawElement);
         } else {
-          children.push(this.parseBlock(line.indent + 1, name, args));
+          const blockElement = new BlockElement(cleanName, args);
+          blockElement.children = this.parseBlockItems(line.indent + 1);
+          children.push(blockElement);
         }
       } else {
         // Text or InlineElement
@@ -234,11 +254,20 @@ class Parser {
       }
     }
     maybeEndParagraph();
-    return element;
+    return children;
   }
 }
 
-export const parse = (text: string): BlockElement => {
-  const parser = new Parser(text);
-  return parser.parseBlock(0, "<root>", null);
+export const parse = (text: string): BlockItem[] => {
+  return new Parser(text).parseBlockItems(0);
+};
+
+export const print = (blockItems: BlockItem[]) => {
+  new Printer(process.stdout.write).printBlockItems(blockItems);
+};
+
+export const printStr = (blockItems: BlockItem[]): string => {
+  let output = "";
+  new Printer((s) => (output += s)).printBlockItems(blockItems);
+  return output;
 };

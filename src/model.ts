@@ -68,29 +68,26 @@ export class Paragraph extends Container {
 
 type ElementArgs = string[] | null;
 export class Element extends Container {
-  name: string = "";
+  name: string;
+  isRaw: boolean;
   args?: ElementArgs;
 
-  constructor(name: string, args?: ElementArgs) {
+  constructor(name: string, args?: ElementArgs, isRaw: boolean = false) {
     super();
     this.name = name;
     if (args) {
       this.args = args;
     }
+    this.isRaw = isRaw;
   }
 
-  toString(ind: string = ""): string {
+  toString(_: string = ""): string {
     const args = this.args ? `(${this.args.join(", ")})` : "";
     return `${this.name}${args}`;
   }
 }
 export class BlockElement extends Element {
-  children: BlockItem[] | string = [];
-
-  constructor(name: string, args: ElementArgs, children: BlockItem[] | string) {
-    super(name, args);
-    this.children = children;
-  }
+  children: BlockItem[] | string | null = null;
 
   toString(ind: string): string {
     return `${ind}B.${super.toString()}\n${this.childrenToString(ind + "  ", "\n")}`;
@@ -98,11 +95,6 @@ export class BlockElement extends Element {
 }
 export class InlineElement extends Element {
   children: InlineItem[] | string | null = [];
-
-  constructor(name: string, args: ElementArgs, children: InlineItem[] | string) {
-    super(name, args);
-    this.children = children;
-  }
 
   toString(ind: string): any {
     let children = "";
