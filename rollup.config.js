@@ -23,7 +23,8 @@ export default [
   // Tests
   {
     input: "test/test.ts",
-    plugins: [resolve(), typescript()],
+    external: ["chalk"],
+    plugins: [resolve(), commonjs(), typescript()],
     output: { file: "dist/test.js", format: "es", sourcemap: true },
   },
 ];

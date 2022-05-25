@@ -138,7 +138,7 @@
         P
           I.c
 
-@parse-test(More nested block commands FIXME)
+@parse-test(More nested block commands)
   @input*
     @a
       @b

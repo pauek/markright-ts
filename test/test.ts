@@ -1,6 +1,10 @@
 import { readdir, readFile } from "fs/promises";
 import { parse } from "../src/markright";
 import { BlockElement, BlockItem } from "../src/model";
+import chalk from "chalk";
+
+const passChar = "·";
+const failChar = "X";
 
 const assert = (cond: boolean, msg: string) => {
   if (!cond) {
@@ -63,7 +67,8 @@ interface TestResult {
 
 const performParseTest = (title: string, input: string, output: string): TestResult => {
   const fromInput = parse(input)
-    .map((elem) => elem.toString("") + "\n").join("");
+    .map((elem) => elem.toString("") + "\n")
+    .join("");
   if (fromInput === output) {
     return { title, pass: true };
   } else {
@@ -89,18 +94,63 @@ const processTestFile = async (file: string): Promise<TestResult[]> => {
   const results: TestResult[] = [];
   for (const test of testSuite) {
     const result = performTest(validateTest(test));
-    process.stdout.write(result.pass ? "." : "x");
+    process.stdout.write(result.pass ? chalk.green(passChar) : chalk.bold.red(failChar));
     results.push(result);
   }
+  process.stdout.write("\n");
   return results;
+};
+
+const maxLength = (lines: string[]) => lines.reduce((ac, x) => Math.max(ac, x.length), 0);
+
+const padRight = (lines: string[], len: number): string[] =>
+  lines.map((line) => line.padEnd(len, " "));
+
+const highlightDifferences = (maxLen: number, actual: string, expected: string) => {
+  let actualDiff: string = "",
+    expectedDiff: string = "";
+  for (let i = 0; i < maxLen; i++) {
+    const equal = actual[i] === expected[i];
+    if (i < actual.length) {
+      actualDiff += equal ? actual[i] : chalk.bgYellow.black(actual[i]);
+    } else {
+      actualDiff += " ";
+    }
+    if (i < expected.length) {
+      expectedDiff += equal ? expected[i] : chalk.bgYellow.black(expected[i]);
+    } else {
+      expectedDiff += " ";
+    }
+  }
+  return actualDiff + " " + expectedDiff + "\n";
+};
+
+const compareOutputs = (actual: string, expected: string) => {
+  const actualLines = actual.split("\n");
+  const expectedLines = expected.split("\n");
+  const maxLen = maxLength(actualLines);
+  const paddedActualLines = padRight(actualLines, maxLen + 1);
+
+  process.stdout.write(
+    chalk.red("Actual:".padEnd(maxLen + 1, " ") + chalk.green("Expected:") + "\n")
+  );
+  for (let i = 0; i < Math.max(paddedActualLines.length, expectedLines.length); i++) {
+    const actual = actualLines[i];
+    const expected = expectedLines[i];
+    let line = `${paddedActualLines[i]} ${expected}\n`;
+    if (i > 0 /* header */ && actual !== expected) {
+      process.stdout.write(highlightDifferences(maxLen + 1, actual, expected));
+    } else {
+      process.stdout.write(chalk.dim(line));
+    }
+  }
 };
 
 const reportResults = (results: TestResult[]) => {
   for (const result of results) {
     if (!result.pass) {
-      process.stdout.write(`${result.title}\n`);
-      process.stdout.write(`Actual: #\n${result.actual}#\n`);
-      process.stdout.write(`Expected: #\n${result.expected}#\n`);
+      process.stdout.write(chalk.bold.yellow(`${result.title}\n`));
+      compareOutputs(result.actual!, result.expected!);
     }
   }
 };

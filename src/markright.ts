@@ -42,12 +42,9 @@ const parseLine = (line: string): Line => {
   while (firstNonSpace < line.length && line[firstNonSpace] === " ") {
     firstNonSpace++;
   }
-  if (firstNonSpace % 2 == 1) {
-    throw new Error("Indentation has to be a multiple of 2!");
-  }
   return {
     text: line.slice(firstNonSpace),
-    indent: firstNonSpace / 2,
+    indent: firstNonSpace,
   };
 };
 
@@ -195,7 +192,7 @@ class Parser {
         pendingEndl = false;
       }
       if (line.indent > baseIndent) {
-        line.text = "  ".repeat(line.indent - baseIndent) + line.text;
+        line.text = " ".repeat(line.indent - baseIndent) + line.text;
       }
       result += `${line.text}\n`;
       this.curr++;
@@ -239,11 +236,11 @@ class Parser {
         const { isRaw, cleanName } = isRawElement(name);
         if (isRaw) {
           const blockRawElement = new BlockElement(cleanName, args, true);
-          blockRawElement.children = this.parseBlockRawText(line.indent + 1, cleanName, args);
+          blockRawElement.children = this.parseBlockRawText(line.indent + 2, cleanName, args);
           children.push(blockRawElement);
         } else {
           const blockElement = new BlockElement(cleanName, args);
-          blockElement.children = this.parseBlockItems(line.indent + 1);
+          blockElement.children = this.parseBlockItems(line.indent + 2);
           children.push(blockElement);
         }
       } else {
