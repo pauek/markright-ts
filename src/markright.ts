@@ -263,7 +263,7 @@ export const print = (blockItems: BlockItem[]) => {
   new Printer(process.stdout.write).printBlockItems(blockItems);
 };
 
-export const printStr = (blockItems: BlockItem[]): string => {
+export const printToString = (blockItems: BlockItem[]): string => {
   let output = "";
   new Printer((s) => (output += s)).printBlockItems(blockItems);
   return output;
