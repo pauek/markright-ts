@@ -1,5 +1,4 @@
 import { Text, Paragraph, InlineItem, InlineElement, BlockElement, BlockItem } from "./model";
-import Printer from "./printer";
 
 const elementStartChar = "@";
 const openDelimiters = "[{(<";
@@ -259,12 +258,6 @@ export const parse = (text: string): BlockItem[] => {
   return new Parser(text).parseBlockItems(0);
 };
 
-export const print = (blockItems: BlockItem[]) => {
-  new Printer(process.stdout.write).printBlockItems(blockItems);
-};
+export { print, printToString } from "./printer";
 
-export const printToString = (blockItems: BlockItem[]): string => {
-  let output = "";
-  new Printer((s) => (output += s)).printBlockItems(blockItems);
-  return output;
-};
+

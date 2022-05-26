@@ -97,7 +97,6 @@ const processTestFile = async (file: string): Promise<TestResult[]> => {
     process.stdout.write(result.pass ? chalk.green(passChar) : chalk.bold.red(failChar));
     results.push(result);
   }
-  process.stdout.write("\n");
   return results;
 };
 
@@ -147,6 +146,7 @@ const compareOutputs = (actual: string, expected: string) => {
 };
 
 const reportResults = (results: TestResult[]) => {
+  const sep: boolean = false;
   for (const result of results) {
     if (!result.pass) {
       process.stdout.write(chalk.bold.yellow(`${result.title}\n`));

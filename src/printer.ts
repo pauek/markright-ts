@@ -8,7 +8,7 @@ import {
   Paragraph,
 } from "./model";
 
-export default class Printer {
+class Printer {
   indentLevel: number = 0;
   write: (s: string) => void;
 
@@ -115,3 +115,13 @@ export default class Printer {
     }
   }
 }
+
+export const print = (blockItems: BlockItem[]) => {
+  new Printer(process.stdout.write).printBlockItems(blockItems);
+};
+
+export const printToString = (blockItems: BlockItem[]): string => {
+  let output = "";
+  new Printer((s) => (output += s)).printBlockItems(blockItems);
+  return output;
+};
