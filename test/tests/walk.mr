@@ -1,0 +1,26 @@
+
+@parse-test(Parse test 1)
+  @input*
+    @a(1, 2){content}
+  @output*
+    P
+      I.a(1, 2)["content"]
+
+@walk-test(Walk test 1)
+  @funcMap*
+    [text]: (t) => t
+    a: (args, children) => `a(${args.join(", ")})[${children}]`
+    [blockChildren]: (children) => children.join('\n') + '\n'
+  @input
+    @a(1, 2){content}
+  @output*
+    a(1, 2)[content]
+
+@walk-test(Text)
+  @funcMap*
+    [text]: (text) => text.toUpperCase()
+    [blockChildren]: (ch) => `${ch}\n`
+  @input
+    hello
+  @output*
+    HELLO

@@ -29,7 +29,7 @@ export type BlockItem = BlockElement | Paragraph;
 export type InlineItem = InlineElement | Text;
 export type Item = BlockItem | InlineItem;
 
-export abstract class Container {
+export class Container {
   children: Item[] | string | null = null;
 
   childrenToString(ind: string, sep: string): string {
@@ -38,6 +38,22 @@ export abstract class Container {
     } else {
       return `"${this.children}"`;
     }
+  }
+
+  findByName(...nameList: string[]): Array<Item | null> {
+    const results: Array<Item | null> = Array(nameList.length);
+    if (!Array.isArray(this.children)) {
+      return results;
+    }
+    for (const child of this.children) {
+      if (child instanceof Element) {
+        const pos = nameList.indexOf(child.name);
+        if (pos !== -1 && results[pos] === undefined) {
+          results[pos] = child;
+        }
+      }
+    }
+    return results;
   }
 }
 
@@ -67,18 +83,16 @@ export class Paragraph extends Container {
 }
 
 export type ElementArgs = string[] | null;
-export class Element extends Container {
+class Element extends Container {
   name: string;
   isRaw: boolean;
-  args?: ElementArgs;
+  args: ElementArgs;
 
   constructor(name: string, args: ElementArgs, isRaw: boolean = false) {
     super();
     this.name = name;
-    if (args) {
-      this.args = args;
-    }
     this.isRaw = isRaw;
+    this.args = args;
   }
 
   toString(_: string = ""): string {
