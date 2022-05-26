@@ -66,13 +66,13 @@ export class Paragraph extends Container {
   }
 }
 
-type ElementArgs = string[] | null;
+export type ElementArgs = string[] | null;
 export class Element extends Container {
   name: string;
   isRaw: boolean;
   args?: ElementArgs;
 
-  constructor(name: string, args?: ElementArgs, isRaw: boolean = false) {
+  constructor(name: string, args: ElementArgs, isRaw: boolean = false) {
     super();
     this.name = name;
     if (args) {
