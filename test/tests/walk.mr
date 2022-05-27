@@ -8,8 +8,8 @@
 
 @walk-test(Walk test 1)
   @funcMap*
-    [text]: (t) => t
-    a: (args, children) => `a(${args.join(", ")})[${children}]`
+    [text]: (t) => t,
+    a: (args, children) => `a(${args.join(", ")})[${children}]`,
     [blockChildren]: (children) => children.join('\n') + '\n'
   @input
     @a(1, 2){content}
@@ -18,7 +18,7 @@
 
 @walk-test(Text)
   @funcMap*
-    [text]: (text) => text.toUpperCase()
+    [text]: (text) => text.toUpperCase(),
     [blockChildren]: (ch) => `${ch}\n`
   @input
     hello

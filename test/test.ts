@@ -156,7 +156,7 @@ const performParseTest = (test: ParseTest): TestResult => {
 const performWalkTest = (test: WalkTest): TestResult => {
   const funcMap = eval(`(
     (blockChildren, inlineChildren, blockElement, inlineElement, text, paragraph) => ({
-      ${test.funcMap.split("\n").join(",")}
+      ${test.funcMap.split("\n").join("")}
     })
   )`);
   const result = walk(
