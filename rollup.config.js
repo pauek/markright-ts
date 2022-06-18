@@ -1,30 +1,22 @@
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
-import pkg from "./package.json";
+import dts from "rollup-plugin-dts";
 
 export default [
   {
-    input: "src/markright.ts",
-    plugins: [resolve(), commonjs(), typescript()],
+    input: "./src/markright.ts",
     output: {
-      name: "markright",
-      file: pkg.browser,
-      format: "umd",
+      file: "./dist/markright.js",
+      format: "es",
       sourcemap: true,
     },
+    plugins: [typescript({ tsconfig: "./tsconfig.json" })],
   },
   {
-    input: "src/markright.ts",
-    external: ["ms"],
-    plugins: [typescript()],
-    output: { file: pkg.module, format: "es", sourcemap: true },
-  },
-  // Tests
-  {
-    input: "test/test.ts",
-    external: ["chalk"],
-    plugins: [resolve(), commonjs(), typescript()],
-    output: { file: "dist/test.js", format: "es", sourcemap: true },
+    input: "./dist/markright.d.ts",
+    output: {
+      file: "dist/markright.d.ts",
+      format: "es",
+    },
+    plugins: [dts()],
   },
 ];

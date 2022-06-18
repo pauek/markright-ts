@@ -83,7 +83,7 @@ export class Paragraph extends Container {
 }
 
 export type ElementArgs = string[] | null;
-class Element extends Container {
+export class Element extends Container {
   name: string;
   isRaw: boolean;
   args: ElementArgs;
