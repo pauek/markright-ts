@@ -10,14 +10,19 @@ import {
 
 /*
 
-El walker tiene dos modelos de funcionamiento:
+El walker debería tener dos modelos de funcionamiento:
 
 1) Recorrer cada nodo del árbol y devolver un resultado de cada nodo.
    Si se hace recursivamente se obtiene un resultado.
+   Fácil de programar pero más lento.
+
 2) El otro modo es recorrer el árbol depth-first, de forma que si quieres
    puedes usar la secuencia de llamadas para generar el resultado. 
+   Este es el modo más rápido. Requiere una función para parsear los hijos,
+   para poder decidir cuándo hacerlo.
 
-El walker debería soportar los dos modos de trabajo...
+El walker debería soportar los dos modos de trabajo... AHORA EL MODO 2 NO EXISTE AÚN!
+Habrá que escoger, o sea hacer 2 walkers (dos funciones walk).
 
 */
 
