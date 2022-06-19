@@ -5,8 +5,9 @@
   "files": [
     "internal"
   ],
-  "module": "internal/index.js",
-  "types": "internal/index.d.ts",
+  "main": "./internal/index.js",
+  "module": "./internal/index.js",
+  "types": "./internal/index.d.ts",
   "scripts": {
     "clean": "rimraf ./intermediate ./internal",
     "precompile": "npm run clean",
@@ -14,7 +15,7 @@
     "prebuild": "npm run compile",
     "build": "rollup -c",
     "pretest": "tsc -p test",
-    "test": "npm run --silent build && node ./test/test.js"
+    "test": "node ./test/test.js"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
