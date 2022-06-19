@@ -19,19 +19,15 @@
 
 @walk-test(Element 1)
   @funcMap*
-    elm: (args, children) => {
-      return `**${children.join("")}**`;
-    }
+    elm: (args, children) => `**${children.join("")}**`
   @input
-    hola @elm{que} tal
+    hola     @elm{que}    tal
   @output*
     hola **que** tal
 
 @walk-test(Element 2)
   @funcMap*
-    elm: (_, children) => {
-      return `**${children.join("")}**`;
-    }
+    elm: (_, children) => `**${children.join("")}**`
   @input
     @elm
       some content

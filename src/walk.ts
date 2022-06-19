@@ -72,7 +72,8 @@ class Walker {
       return func(children);
     }
     if (Array.isArray(children)) {
-      children = children.join("");
+      // Default paragraph behavior (trim + join)
+      children = children.map(s => s.trim()).join(" ");
     }
     return children;
   }
