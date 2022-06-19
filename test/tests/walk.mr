@@ -1,6 +1,6 @@
 @walk-test(Text 1)
   @funcMap*
-    [text]: (t) => t.toUpperCase()
+    [text]: ({ text }) => text.toUpperCase()
   @input
     hi
   @output*
@@ -8,8 +8,8 @@
 
 @walk-test(Text 2)
   @funcMap*
-    [text]: (t) => t.toUpperCase(),
-    [paragraph]: (ch) => ch.join("\n")
+    [text]: ({ text }) => text.toUpperCase(),
+    [paragraph]: ({ children }) => children.join("\n")
   @input
     hello
     brodda
@@ -19,7 +19,7 @@
 
 @walk-test(Element 1)
   @funcMap*
-    elm: (args, children) => `**${children.join("")}**`
+    elm: ({ args, children }) => `**${children.join("")}**`
   @input
     hola     @elm{que}    tal
   @output*
@@ -27,7 +27,7 @@
 
 @walk-test(Element 2)
   @funcMap*
-    elm: (_, children) => `**${children.join("")}**`
+    elm: ({ children }) => `**${children.join("")}**`
   @input
     @elm
       some content
@@ -39,7 +39,7 @@
 
 @walk-test(Paragraph 1)
   @funcMap*
-    [paragraph]: (children) => children.join("<br>\n")
+    [paragraph]: ({ children }) => children.join("<br>\n")
   @input
     some paragraph
     in more
@@ -51,7 +51,7 @@
 
 @walk-test(Paragraph 2)
   @funcMap*
-    [paragraph]: (children) => children.join(" - ")
+    [paragraph]: ({ children }) => children.join(" - ")
   @input
     a
     b
@@ -61,7 +61,7 @@
 
 @walk-test(Args 1)
   @funcMap*
-    a: (args, children) => `a(${args.join(", ")})[${children}]`,
+    a: ({ args, children }) => `a(${args.join(", ")})[${children}]`,
   @input
     @a(1, 2){content}
   @output*
@@ -69,7 +69,7 @@
 
 @walk-test(InlineElement)
   @funcMap*
-    elem: (args, children) => `[[${children.join("")}]]`,
+    elem: ({ args, children }) => `[[${children.join("")}]]`,
   @input
     @elem{hi, there}
   @output*
@@ -77,11 +77,11 @@
 
 @walk-test(Object 1)
   @funcMap*
-    [paragraph]: (children) => children /* avoid join */,
-    name: (_, children) => ({ name: children.join("") }),
-    age: (_, children) => ({ age: Number(children.join("")) }),
-    obj: (_, children) => Object.assign({}, ...children[0]),
-    result: (_, children) => JSON.stringify(children)
+    [paragraph]: ({ children }) => children /* avoid join */,
+    name: ({ children }) => ({ name: children.join("") }),
+    age: ({ children }) => ({ age: Number(children.join("")) }),
+    obj: ({ children }) => Object.assign({}, ...children[0]),
+    result: ({ children }) => JSON.stringify(children)
   @input
     @result
       @obj

@@ -8,6 +8,19 @@ import {
   Text,
 } from "./model";
 
+/*
+
+El walker tiene dos modelos de funcionamiento:
+
+1) Recorrer cada nodo del árbol y devolver un resultado de cada nodo.
+   Si se hace recursivamente se obtiene un resultado.
+2) El otro modo es recorrer el árbol depth-first, de forma que si quieres
+   puedes usar la secuencia de llamadas para generar el resultado. 
+
+El walker debería soportar los dos modos de trabajo...
+
+*/
+
 type ElementChildren = string | BlockItem[] | InlineItem[] | null;
 
 export const symText: unique symbol = Symbol("text");
@@ -17,14 +30,37 @@ export const symBlockChildren: unique symbol = Symbol("blockItems");
 export const symInlineElement: unique symbol = Symbol("inlineElement");
 export const symInlineChildren: unique symbol = Symbol("inlineItems");
 
+interface ElementFuncArgs {
+  args: ElementArgs;
+  children: ElementChildren;
+}
+
+interface TextFuncArgs {
+  text: string;
+}
+
+interface GenericElementFuncArgs {
+  name: string;
+  args: ElementArgs;
+  children: ElementChildren;
+}
+
+interface InlineChildrenFuncArgs {
+  children: InlineItem[];
+}
+
+interface BlockChildrenFuncArgs {
+  children: BlockItem[];
+}
+
 type FuncMap = {
-  [name: string]: (args: ElementArgs, children: ElementChildren) => any;
-  [symText]?: (text: string) => any;
-  [symBlockElement]?: (name: string, args: ElementArgs, children: ElementChildren) => any;
-  [symInlineElement]?: (name: string, args: ElementArgs, children: ElementChildren) => any;
-  [symParagraph]?: (children: InlineItem[]) => any;
-  [symBlockChildren]?: (children: BlockItem[]) => any;
-  [symInlineChildren]?: (children: InlineItem[]) => any;
+  [name: string]: (params: ElementFuncArgs) => any;
+  [symText]?: (params: TextFuncArgs) => any;
+  [symBlockElement]?: (params: GenericElementFuncArgs) => any;
+  [symInlineElement]?: (params: GenericElementFuncArgs) => any;
+  [symParagraph]?: (params: InlineChildrenFuncArgs) => any;
+  [symBlockChildren]?: (params: BlockChildrenFuncArgs) => any;
+  [symInlineChildren]?: (params: InlineChildrenFuncArgs) => any;
 };
 
 class Walker {
@@ -41,7 +77,7 @@ class Walker {
 
   walkText(text: Text) {
     const func = this.funcMap[symText];
-    const result = func ? func(text.text) : text.text;
+    const result = func ? func({ text: text.text }) : text.text;
     return result;
   }
 
@@ -52,11 +88,12 @@ class Walker {
     }
     const func1 = this.getFuncByName(elem.name);
     if (func1) {
-      return func1(elem.args ?? null, children);
+      return func1({ args: elem.args ?? null, children });
     }
     const func2 = this.funcMap[symInlineElement];
     if (func2) {
-      return func2(elem.name, elem.args, children);
+      const { name, args } = elem;
+      return func2({ name, args, children });
     }
     console.warn(`Warning: function for InlineElement '${elem.name}' not found`);
     return elem.children;
@@ -69,11 +106,11 @@ class Walker {
     }
     const func = this.funcMap[symParagraph];
     if (func) {
-      return func(children);
+      return func({ children });
     }
     if (Array.isArray(children)) {
       // Default paragraph behavior (trim + join)
-      children = children.map(s => s.trim()).join(" ");
+      children = children.map((s) => s.trim()).join(" ");
     }
     return children;
   }
@@ -85,18 +122,19 @@ class Walker {
     }
     const func1 = this.getFuncByName(elem.name);
     if (func1) {
-      return func1(elem.args ?? null, children);
+      return func1({ args: elem.args ?? null, children });
     }
     const func2 = this.funcMap[symBlockElement];
     if (func2) {
-      return func2(elem.name, elem.args, children);
+      const { name, args } = elem;
+      return func2({ name, args, children });
     }
     console.log(`Warning: function for BlockElement '${elem.name}' not found`);
     return children;
   }
 
   walkInlineItems(inlineItems: InlineItem[]) {
-    const results = inlineItems.map((item) => {
+    const children = inlineItems.map((item) => {
       if (item instanceof InlineElement) {
         return this.walkInlineElement(item);
       } else if (item instanceof Text) {
@@ -104,11 +142,11 @@ class Walker {
       }
     });
     const func = this.funcMap[symInlineChildren];
-    return func ? func(results) : results;
+    return func ? func({ children }) : children;
   }
 
   walkBlockItems(blockItems: BlockItem[]) {
-    const results = blockItems.map((item) => {
+    const children = blockItems.map((item) => {
       if (item instanceof BlockElement) {
         return this.walkBlockElement(item);
       } else if (item instanceof Paragraph) {
@@ -116,7 +154,7 @@ class Walker {
       }
     });
     const func = this.funcMap[symBlockChildren];
-    return func ? func(results) : results;
+    return func ? func({ children }) : children;
   }
 }
 
