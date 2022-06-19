@@ -1,22 +1,19 @@
-import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 
 export default [
   {
-    input: "./src/markright.ts",
+    input: "intermediate/markright.js",
     output: {
-      file: "./dist/markright.js",
-      format: "es",
-      sourcemap: true,
+      file: 'internal/index.js',
+      format: 'esm',
     },
-    plugins: [typescript({ tsconfig: "./tsconfig.json" })],
   },
   {
-    input: "./dist/markright.d.ts",
+    input: "intermediate/markright.d.ts",
     output: {
-      file: "dist/markright.d.ts",
-      format: "es",
+      file: "internal/index.d.ts",
+      format: "es"
     },
     plugins: [dts()],
-  },
-];
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "paths": {
+      "markright": ["../internal"],
+    },
+  },
+}

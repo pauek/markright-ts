@@ -1,15 +1,17 @@
-import { readdir, readFile } from "fs/promises";
-import { parse, walk } from "../src/markright";
-import { BlockElement, BlockItem, Paragraph } from "../src/model";
 import chalk from "chalk";
+import { readdir, readFile } from "fs/promises";
 import {
+  parse,
+  walk,
+  BlockElement,
+  BlockItem,
   symBlockChildren,
   symBlockElement,
   symInlineChildren,
   symInlineElement,
   symParagraph,
   symText,
-} from "../src/walk";
+} from "../internal/index.js";
 
 const passChar = "·";
 const failChar = "X";
@@ -257,9 +259,7 @@ const compareOutputs = (actual: string, expected: string) => {
   const maxLen = Math.max(maxLength(actualLines), maxLength(expectedLines)) + 3;
   const paddedActualLines = padRight(actualLines, maxLen);
 
-  process.stdout.write(
-    chalk.red("Actual:".padEnd(maxLen, " ") + chalk.green("Expected:") + "\n")
-  );
+  process.stdout.write(chalk.red("Actual:".padEnd(maxLen, " ") + chalk.green("Expected:") + "\n"));
   for (let i = 0; i < Math.max(paddedActualLines.length, expectedLines.length); i++) {
     const actual = actualLines[i];
     const expected = expectedLines[i];

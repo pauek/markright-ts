@@ -70,7 +70,7 @@ export class Text {
 }
 
 export class Paragraph extends Container {
-  children: InlineItem[];
+  children: InlineItem[] = [];
 
   constructor(children: InlineItem[] = []) {
     super();
