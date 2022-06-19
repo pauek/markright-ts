@@ -161,7 +161,7 @@ const performWalkTest = (test: WalkTest): TestResult => {
       ${test.funcMap.split("\n").join("")}
     })
   )`);
-  const result = walk(
+  let result: any = walk(
     test.input,
     funcMap(
       symBlockChildren,
@@ -172,6 +172,9 @@ const performWalkTest = (test: WalkTest): TestResult => {
       symParagraph
     )
   );
+  if (Array.isArray(result)) {
+    result = result.join("\n") + "\n";
+  }
   if (typeof result !== "string") {
     return {
       type: "error",

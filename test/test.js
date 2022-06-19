@@ -95,7 +95,10 @@ const performWalkTest = (test) => {
       ${test.funcMap.split("\n").join("")}
     })
   )`);
-    const result = walk(test.input, funcMap(symBlockChildren, symInlineChildren, symBlockElement, symInlineElement, symText, symParagraph));
+    let result = walk(test.input, funcMap(symBlockChildren, symInlineChildren, symBlockElement, symInlineElement, symText, symParagraph));
+    if (Array.isArray(result)) {
+        result = result.join("\n") + "\n";
+    }
     if (typeof result !== "string") {
         return {
             type: "error",

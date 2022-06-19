@@ -1,7 +1,13 @@
+@walk-test(1)
+  @funcMap*
+    [text]: (t) => t.toUpperCase()
+  @input
+    hi
+  @output*
+    HI
 @walk-test(Walk test 1)
   @funcMap*
     a: (args, children) => `a(${args.join(", ")})[${children}]`,
-    [blockChildren]: (children) => children.join('\n') + '\n'
   @input
     @a(1, 2){content}
   @output*
@@ -10,7 +16,6 @@
 @walk-test(Text)
   @funcMap*
     [text]: (t) => t.toUpperCase(),
-    [blockChildren]: (ch) => `${ch}\n`
   @input
     hello
   @output*
@@ -19,7 +24,6 @@
 @walk-test(InlineElement)
   @funcMap*
     elem: (args, children) => `[[${children.join("")}]]`,
-    [blockChildren]: (ch) => `${ch}\n`
   @input
     @elem{hi, there}
   @output*
