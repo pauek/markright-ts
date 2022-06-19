@@ -297,7 +297,6 @@ const reportResults = (file: string, testResults: TestResult[]) => {
     if (res.type === "error") {
       console.log(`Failed to execute: ${res.error}`);
     } else if (res.type === "diff") {
-      console.log(res);
       compareOutputs(res.actual!, res.expected!);
     }
     process.stdout.write("\n");

@@ -1,25 +1,75 @@
-@walk-test(1)
+@walk-test(Text 1)
   @funcMap*
     [text]: (t) => t.toUpperCase()
   @input
     hi
   @output*
     HI
-@walk-test(Walk test 1)
+
+@walk-test(Text 2)
+  @funcMap*
+    [text]: (t) => t.toUpperCase(),
+    [paragraph]: (ch) => ch.join("\n")
+  @input
+    hello
+    brodda
+  @output*
+    HELLO
+    BRODDA
+
+@walk-test(Element 1)
+  @funcMap*
+    elm: (args, children) => {
+      return `**${children.join("")}**`;
+    }
+  @input
+    hola @elm{que} tal
+  @output*
+    hola **que** tal
+
+@walk-test(Element 2)
+  @funcMap*
+    elm: (_, children) => {
+      return `**${children.join("")}**`;
+    }
+  @input
+    @elm
+      some content
+    @elm
+      some other content
+  @output*
+    **some content**
+    **some other content**
+
+@walk-test(Paragraph 1)
+  @funcMap*
+    [paragraph]: (children) => children.join("<br>\n")
+  @input
+    some paragraph
+    in more
+    than one line
+  @output*
+    some paragraph<br>
+    in more<br>
+    than one line
+
+@walk-test(Paragraph 2)
+  @funcMap*
+    [paragraph]: (children) => children.join(" - ")
+  @input
+    a
+    b
+    c
+  @output*
+    a - b - c
+
+@walk-test(Args 1)
   @funcMap*
     a: (args, children) => `a(${args.join(", ")})[${children}]`,
   @input
     @a(1, 2){content}
   @output*
     a(1, 2)[content]
-
-@walk-test(Text)
-  @funcMap*
-    [text]: (t) => t.toUpperCase(),
-  @input
-    hello
-  @output*
-    HELLO
 
 @walk-test(InlineElement)
   @funcMap*
@@ -28,3 +78,21 @@
     @elem{hi, there}
   @output*
     [[hi, there]]
+
+@walk-test(Object 1)
+  @funcMap*
+    [paragraph]: (children) => children /* avoid join */,
+    name: (_, children) => ({ name: children.join("") }),
+    age: (_, children) => ({ age: Number(children.join("")) }),
+    obj: (_, children) => Object.assign({}, ...children[0]),
+    result: (_, children) => JSON.stringify(children)
+  @input
+    @result
+      @obj
+        @name{James}
+        @age{27}
+      @obj
+        @name{John}
+        @age{13}
+  @output*
+    [{"name":"James","age":27},{"name":"John","age":13}]

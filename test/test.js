@@ -220,7 +220,6 @@ const reportResults = (file, testResults) => {
             console.log(`Failed to execute: ${res.error}`);
         }
         else if (res.type === "diff") {
-            console.log(res);
             compareOutputs(res.actual, res.expected);
         }
         process.stdout.write("\n");

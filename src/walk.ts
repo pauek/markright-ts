@@ -63,12 +63,18 @@ class Walker {
   }
 
   walkParagraph(paragraph: Paragraph) {
-    let children = paragraph.children;
+    let children: any = paragraph.children;
     if (Array.isArray(children)) {
       children = this.walkInlineItems(children);
     }
     const func = this.funcMap[symParagraph];
-    return func ? func(children) : children;
+    if (func) {
+      return func(children);
+    }
+    if (Array.isArray(children)) {
+      children = children.join("");
+    }
+    return children;
   }
 
   walkBlockElement(elem: BlockElement): any {
