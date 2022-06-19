@@ -8,12 +8,13 @@
   "module": "internal/index.js",
   "types": "internal/index.d.ts",
   "scripts": {
-    "precompile": "rimraf ./intermediate",
-    "prebuild": "rimraf ./internal",
+    "clean": "rimraf ./intermediate ./internal",
+    "precompile": "npm run clean",
     "compile": "tsc -p src",
-    "build": "npm run compile && rollup -c",
+    "prebuild": "npm run compile",
+    "build": "rollup -c",
     "pretest": "tsc -p test",
-    "test": "node ./test/test.js"
+    "test": "npm run --silent build && node ./test/test.js"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
