@@ -46,7 +46,7 @@ class Walker {
   }
 
   walkInlineElement(elem: InlineElement): any {
-    let children = elem.children;
+    let children: any = elem.children;
     if (Array.isArray(children)) {
       children = this.walkInlineItems(children);
     }
@@ -58,20 +58,21 @@ class Walker {
     if (func2) {
       return func2(elem.name, elem.args, children);
     }
-    console.warn(`Warning: function for inlineElement ${elem.name} not found`);
+    console.warn(`Warning: function for InlineElement '${elem.name}' not found`);
     return elem.children;
   }
 
   walkParagraph(paragraph: Paragraph) {
-    const func = this.funcMap[symParagraph];
-    if (func) {
-      return func(paragraph.children);
+    let children = paragraph.children;
+    if (Array.isArray(children)) {
+      children = this.walkInlineItems(children);
     }
-    return this.walkInlineItems(paragraph.children);
+    const func = this.funcMap[symParagraph];
+    return func ? func(children) : children;
   }
 
   walkBlockElement(elem: BlockElement): any {
-    let children = elem.children;
+    let children: any = elem.children;
     if (Array.isArray(children)) {
       children = this.walkBlockItems(children);
     }
@@ -83,7 +84,7 @@ class Walker {
     if (func2) {
       return func2(elem.name, elem.args, children);
     }
-    console.log(`Warning: function for blockElement ${elem.name} not found`);
+    console.log(`Warning: function for BlockElement '${elem.name}' not found`);
     return children;
   }
 
