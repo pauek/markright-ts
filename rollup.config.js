@@ -1,4 +1,5 @@
 import dts from "rollup-plugin-dts";
+import sourcemaps from "rollup-plugin-sourcemaps";
 
 export default [
   {
@@ -6,7 +7,9 @@ export default [
     output: {
       file: 'internal/index.js',
       format: 'esm',
+      sourcemap: true,
     },
+    plugins: [sourcemaps()],
   },
   {
     input: "intermediate/markright.d.ts",
