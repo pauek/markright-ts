@@ -1,0 +1,81 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "markright",
+  "patterns": [
+    {
+      "include": "#inline-command-1"
+    },
+    {
+      "include": "#inline-command-2"
+    },
+    {
+      "include": "#command"
+    },
+    {
+      "include": "#comment"
+    }
+  ],
+  "repository": {
+    "command": {
+      "patterns": [
+        {
+          "name": "keyword.other",
+          "begin": "@([a-zA-Z0-9_-]+)\\(",
+          "end": "\\)",
+          "patterns": [
+            {
+              "name": "variable",
+              "match": "[^,)]+"
+            },
+            {
+              "name": "keyword.other",
+              "match": ","
+            }
+          ]
+        },
+        {
+          "name": "keyword.other",
+          "match": "@([a-zA-Z0-9_-]+)"
+        },
+        {
+          "name": "keyword.other",
+          "match": "@([a-zA-Z0-9_-]+)"
+        }
+      ]
+    },
+    "inline-command-1": {
+      "patterns": [
+        {
+          "name": "keyword.other",
+          "begin": "@([a-zA-Z0-9_-]+)<",
+          "end": ">",
+          "patterns": [
+            {
+              "name": "string",
+              "match": "[^>]+"
+            }
+          ]
+        }
+      ]
+    },
+    "inline-command-2": {
+      "patterns": [
+        {
+          "name": "keyword.other",
+          "begin": "@([a-zA-Z0-9_-]+)(\\(([^)]+)\\))?\\{",
+          "end": "\\}",
+          "captures": {
+            "3": { "name": "variable" }
+          },
+          "patterns": [
+            {
+              "name": "string",
+              "match": "[^}]+"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "scopeName": "source.mr"
+}

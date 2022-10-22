@@ -105,7 +105,7 @@ class Walker {
   }
 
   walkParagraph(paragraph: Paragraph) {
-    let children: any = paragraph.children;
+    let children = paragraph.children;
     if (Array.isArray(children)) {
       children = this.walkInlineItems(children);
     }
@@ -113,9 +113,9 @@ class Walker {
     if (func) {
       return func({ children });
     }
-    if (Array.isArray(children)) {
+    if (Array.isArray(children) && children.every(child => typeof child === "string")) {
       // Default paragraph behavior (trim + join)
-      children = children.map((s) => s.trim()).join(" ");
+      return children.map((s) => (s as Text).text.trim()).join(" ");
     }
     return children;
   }
