@@ -1,25 +1,35 @@
 {
-    "name": "markright-lang",
-    "displayName": "Markright Lang",
-    "description": "Syntax Highlighting for markright",
-    "version": "0.0.1",
-    "engines": {
-        "vscode": "^1.38.0"
-    },
-    "categories": [
-        "Programming Languages"
+  "name": "markright-lang",
+  "displayName": "Markright Lang",
+  "description": "Syntax Highlighting for markright",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.38.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "mr",
+        "aliases": [
+          "markright",
+          "mr"
+        ],
+        "extensions": [
+          ".mr",
+          ".minidosis"
+        ],
+        "configuration": "./language-configuration.json"
+      }
     ],
-    "contributes": {
-        "languages": [{
-            "id": "mr",
-            "aliases": ["markright", "mr"],
-            "extensions": [".mr"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "mr",
-            "scopeName": "source.mr",
-            "path": "./syntaxes/mr.tmLanguage.json"
-        }]
-    }
+    "grammars": [
+      {
+        "language": "mr",
+        "scopeName": "source.mr",
+        "path": "./syntaxes/mr.json"
+      }
+    ]
+  }
 }
