@@ -1,5 +1,3 @@
 .DS_Store
 node_modules
-internal
-intermediate
-tests/test.js
+dist

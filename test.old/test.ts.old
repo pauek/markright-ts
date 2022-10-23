@@ -11,7 +11,7 @@ import {
   symInlineElement,
   symParagraph,
   symText,
-} from "../internal/index.js";
+} from "../src/markright";
 
 const passChar = "·";
 const failChar = "X";
@@ -57,7 +57,7 @@ const validateParseTest = (parseTest: BlockElement): ParseTest => {
   assert(outputItem instanceof BlockElement, `Output should be a BlockElement`);
   const input = inputItem as BlockElement;
   const output = outputItem as BlockElement;
-  assert(input.isRaw, "Input should be raw");
+  assert(input.isRaw, `Input should be raw`);
   assert(output.isRaw, `Output should be raw`);
   return {
     type: "parse",
@@ -103,7 +103,7 @@ const validateTestElement = (item: BlockItem): BlockElement => {
   return elem;
 };
 
-const validateTest = (item: BlockItem): Test | null => {
+const validateTest = (item: BlockItem): Test => {
   const elem = validateTestElement(item);
   switch (testType(elem.name)) {
     case "parse":
@@ -111,30 +111,31 @@ const validateTest = (item: BlockItem): Test | null => {
     case "walk":
       return validateWalkTest(elem);
     default:
-      return null;
+      throw "Unknown test type!";
   }
 };
 
-interface TestResultBase {
+type TestResultBase = {
   type: string;
   pass: boolean;
   title: string;
 }
 
-interface TestResultOK extends TestResultBase {
+type TestResultOK = TestResultBase & {
   type: "ok";
   pass: true;
-}
-interface TestResultDifference extends TestResultBase {
+};
+
+type TestResultDifference = TestResultBase & {
   type: "diff";
-  actual?: string;
-  expected?: string;
+  actual: string;
+  expected: string;
 }
 
-interface TestResultError extends TestResultBase {
+type TestResultError = TestResultBase & {
   type: "error";
-  error?: string;
-}
+  error: string;
+};
 
 type TestResult = TestResultOK | TestResultError | TestResultDifference;
 
@@ -205,11 +206,10 @@ const processTestFile = async (file: string): Promise<TestResult[]> => {
   const testSuite = parse(buffer.toString());
   const results: TestResult[] = [];
   for (const item of testSuite) {
-    let result: TestResult | null = null;
     try {
       const test = validateTest(item);
       if (test) {
-        result = performTest(test);
+        results.push(performTest(test));
       } else {
         if (item instanceof BlockElement) {
           console.warn(`Warning: ignoring ${item.name}.`);
@@ -218,15 +218,21 @@ const processTestFile = async (file: string): Promise<TestResult[]> => {
         }
       }
     } catch (e: any) {
-      result = {
-        title: "<unknown>",
-        type: "error",
-        pass: false,
-        error: `Exception: ${e.toString()}`,
-      };
-    }
-    if (result) {
-      results.push(result);
+      if (e instanceof Error) {
+        results.push({
+          title: "<unknown>",
+          type: "error",
+          pass: false,
+          error: `${e.name}: ${e.message}\n${e.stack}`,
+        });
+      } else {
+        results.push({
+          title: "<unknown>",
+          type: "error",
+          pass: false,
+          error: `Exception: ${e.toString()}\n${e as Error}`,
+        });
+      }
     }
   }
   return results;
@@ -282,24 +288,24 @@ const compareOutputs = (actual: string, expected: string) => {
 };
 
 const reportResults = (file: string, testResults: TestResult[]) => {
-  process.stdout.write(`${file}: `);
+  process.stderr.write(`${file}: `);
   for (const res of testResults) {
-    process.stdout.write(res.pass ? chalk.green(passChar) : chalk.bold.red(failChar));
+    process.stderr.write(res.pass ? chalk.green(passChar) : chalk.bold.red(failChar));
   }
-  process.stdout.write("\n");
+  process.stderr.write("\n");
   const failedTestResults = testResults.filter((test) => !test.pass);
   if (failedTestResults.length > 0) {
-    process.stdout.write("\n");
+    process.stderr.write("\n");
   }
   for (let i = 0; i < failedTestResults.length; i++) {
     const res = failedTestResults[i];
-    process.stdout.write(chalk.bold.yellow(`${res.title}\n`));
+    process.stderr.write(chalk.bold.yellow(`${res.title}\n`));
     if (res.type === "error") {
-      console.log(`Failed to execute: ${res.error}`);
+      console.log(`Failed to execute: ${res.error}: ${res.error.toString()}`);
     } else if (res.type === "diff") {
       compareOutputs(res.actual!, res.expected!);
     }
-    process.stdout.write("\n");
+    process.stderr.write("\n");
   }
 };
 

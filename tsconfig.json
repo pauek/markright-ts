@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "sourceRoot": ".",
+    "outDir": "dist",
+    "declaration": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "lib": ["es2017"],
+    "target": "es2017",
+    "inlineSourceMap": true,
+    "inlineSources": true
+  },
+  "include": ["src"]
+}

@@ -3,19 +3,21 @@
   "version": "0.0.1",
   "type": "module",
   "files": [
-    "internal"
+    "dist"
   ],
-  "main": "./internal/index.js",
-  "module": "./internal/index.js",
-  "types": "./internal/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "clean": "rimraf ./intermediate ./internal",
-    "precompile": "npm run clean",
-    "compile": "tsc -p src",
-    "prebuild": "npm run compile",
-    "build": "rollup -c",
-    "pretest": "tsc -p test",
-    "test": "node ./test/test.js"
+    "build": "rimraf ./dist && tsc && rollup -c",
+    "test": "uvu -r tsm tests"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/index.js"
+      }
+    }
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
@@ -26,6 +28,15 @@
     "rollup-plugin-dts": "^4.2.2",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "tslib": "^2.4.0",
-    "typescript": "^4.6.4"
-  }
+    "tsm": "^2.2.2",
+    "typescript": "^4.6.4",
+    "uvu": "^0.5.6"
+  },
+  "contributors": [
+    {
+      "name": "Pau Fernández",
+      "email": "pau.fernandez@upc.edu",
+      "url": "https://twitter.com/pauek"
+    }
+  ]
 }

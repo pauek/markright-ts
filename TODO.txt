@@ -1,0 +1,18 @@
+
+- Markright:
+  1) Lee un árbol de un fichero/string (parse, parseFile)
+  2) Te deja parametrizar la iteración del árbol (walk)
+     Retorna un resultado de una iteración depth-first.
+     Cuántas maneras hay de hacer esto?
+     - Esto te permite hacer transformadores del árbol ("compiladores")
+
+- Falta:
+  - Encontrar un símbolo en el árbol (query, queryAll), devolver el subárbol.
+    El query busca nodos en plan CSS (con padres), a partir de un string.
+    Búsquedas:
+       "title"
+       "section(1) title"
+       "section(*) title"
+    [jerarquía solamente? con los parámetros también?]
+       
+

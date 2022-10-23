@@ -16,13 +16,15 @@ const isAllSpaces = (line: string) => line === " ".repeat(line.length);
 const isDelimiter = (ch: string) => allDelimiters.indexOf(ch) !== -1;
 const isOpenDelim = (ch: string) => openDelimiters.indexOf(ch) !== -1;
 
-const isRawElement = (name: string) => {
-  if (name[name.length - 1] === "*") {
-    return { isRaw: true, cleanName: name.slice(0, -1) };
-  } else {
-    return { isRaw: false, cleanName: name };
-  }
+interface Symbol {
+  name: string;
+  isRaw: boolean;
 }
+const parseSymbol = (name: string): Symbol => {
+  const isRaw = name.slice(-1) === "*";
+  const cleanName = isRaw ? name.slice(0, -1) : name;
+  return { isRaw, name: cleanName };
+};
 
 const matchDelim = (delim: string): string => closeDelimiters[openDelimiters.indexOf(delim)];
 
@@ -33,7 +35,7 @@ interface Line {
   indent: number;
 }
 
-const parseLine = (line: string): Line => {
+const detectLineIndent = (line: string): Line => {
   if (isAllSpaces(line)) {
     return { text: "", indent: 0 };
   }
@@ -50,17 +52,16 @@ const parseLine = (line: string): Line => {
 const splitLines = (text: string): Line[] => {
   let lastChar = text[text.length - 1];
   let limit = text.length + (lastChar === "\n" ? -1 : 0);
-  return text.slice(0, limit).split("\n").map(parseLine);
+  return text.slice(0, limit).split("\n").map(detectLineIndent);
 };
 
-interface ParseElementResult {
+// TODO: Implementar el hecho de que los argumentos ocupen mucho más de una línea!!
+interface ElementHead {
   name: string;
-  args: string[] | null;
-  pos: number;
+  args: string[];
+  end: number;
 }
-
-// FIXME: Implementar el hecho de que los argumentos ocupen mucho más de una línea!!
-const parseElementHead = (text: string, from: number = 0): ParseElementResult => {
+const parseElementHead = (text: string, from: number = 0): ElementHead => {
   assert(text[from] === "@", "Expected @");
 
   let i: number = from + 1;
@@ -74,7 +75,7 @@ const parseElementHead = (text: string, from: number = 0): ParseElementResult =>
     return name;
   };
 
-  const parseArgs = (): string[] | null => {
+  const parseArgs = (): string[] => {
     if (text[i] !== "(") {
       return null;
     }
@@ -96,19 +97,22 @@ const parseElementHead = (text: string, from: number = 0): ParseElementResult =>
     }
     return args;
   };
+
   const name = parseName();
   const args = parseArgs();
-  return { name, args, pos: i };
+  return { name, args, end: i };
 };
 
-const parseElementBody = (
-  line: string,
-  from: number
-): { body: string; delim?: string; pos: number } => {
+interface ElementBody {
+  text: string;
+  delim?: string;
+  end: number;
+}
+const parseElementBody = (line: string, from: number): ElementBody => {
   let i = from;
   const openCh = line[i];
   if (!isOpenDelim(openCh)) {
-    return { body: "", pos: i };
+    return { text: "", end: i };
   }
   let width = 0;
   while (line[i] === openCh) {
@@ -123,9 +127,9 @@ const parseElementBody = (
   }
   i = end + width;
   return {
-    body: line.slice(start, end),
+    text: line.slice(start, end),
     delim: openDelim,
-    pos: i,
+    end: i,
   };
 };
 
@@ -150,15 +154,15 @@ class Parser {
           items.push(text);
           text = new Text("");
         }
-        const { name, args, pos: i2 } = parseElementHead(line, i);
-        const { body, pos: i3 } = parseElementBody(line, i2);
-        const { cleanName, isRaw } = isRawElement(name);
+        const head = parseElementHead(line, i);
+        const body = parseElementBody(line, head.end);
+        const sym = parseSymbol(head.name);
 
-        const inlineElement = new InlineElement(cleanName, args, isRaw);
-        inlineElement.children = isRaw ? body : this.parseLine(body);
+        const inlineElement = new InlineElement(sym.name, head.args, sym.isRaw);
+        inlineElement.children = sym.isRaw ? body.text : this.parseLine(body.text);
         items.push(inlineElement);
 
-        i = i3;
+        i = body.end;
       } else {
         text.text += line[i];
         i++;
@@ -170,14 +174,14 @@ class Parser {
     return items;
   }
 
-  parseBlockRawText(baseIndent: number, name: string, args: string[] | null = null): string {
+  parseBlockRawText(baseIndent: number, name: string, args: string[] = null): string {
     let result: string = "";
     let pendingEndl: boolean = false;
     while (this.curr < this.lines.length) {
       const line = this.lines[this.curr];
       if (isEmptyLine(line)) {
         if (pendingEndl) {
-          result += '\n';
+          result += "\n";
         }
         pendingEndl = true;
         this.curr++;
@@ -187,7 +191,7 @@ class Parser {
         break;
       }
       if (pendingEndl) {
-        result += '\n';
+        result += "\n";
         pendingEndl = false;
       }
       if (line.indent > baseIndent) {
@@ -201,7 +205,7 @@ class Parser {
 
   parseBlockItems(baseIndent: number): BlockItem[] {
     const children: BlockItem[] = [];
-    let paragraph: Paragraph | null = null;
+    let paragraph: Paragraph = null;
 
     const maybeEndParagraph = () => {
       if (paragraph) {
@@ -230,15 +234,15 @@ class Parser {
 
       if (atBlockElement) {
         maybeEndParagraph();
-        const { name, args } = parseElementHead(line.text);
+        const { name: origName, args } = parseElementHead(line.text);
         this.curr++;
-        const { isRaw, cleanName } = isRawElement(name);
-        if (isRaw) {
-          const blockRawElement = new BlockElement(cleanName, args, true);
-          blockRawElement.children = this.parseBlockRawText(line.indent + 2, cleanName, args);
+        const sym = parseSymbol(origName);
+        if (sym.isRaw) {
+          const blockRawElement = new BlockElement(sym.name, args, true);
+          blockRawElement.children = this.parseBlockRawText(line.indent + 2, sym.name, args);
           children.push(blockRawElement);
         } else {
-          const blockElement = new BlockElement(cleanName, args);
+          const blockElement = new BlockElement(sym.name, args);
           blockElement.children = this.parseBlockItems(line.indent + 2);
           children.push(blockElement);
         }

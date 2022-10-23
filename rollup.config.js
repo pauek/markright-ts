@@ -3,18 +3,18 @@ import sourcemaps from "rollup-plugin-sourcemaps";
 
 export default [
   {
-    input: "intermediate/markright.js",
+    input: "dist/markright.js",
     output: {
-      file: 'internal/index.js',
+      file: 'dist/index.js',
       format: 'esm',
       sourcemap: true,
     },
     plugins: [sourcemaps()],
   },
   {
-    input: "intermediate/markright.d.ts",
+    input: "dist/markright.js",
     output: {
-      file: "internal/index.d.ts",
+      file: "dist/index.d.ts",
       format: "es"
     },
     plugins: [dts()],
