@@ -2,9 +2,7 @@ import { test } from "uvu";
 import * as assert from "uvu/assert";
 import * as mr from "../src/markright";
 
-const lines = (lineArray: string[]): string => {
-  return lineArray.map((line) => line + "\n").join("");
-};
+const lines = (lineArray: string[]): string => lineArray.map((line) => line + "\n").join("");
 
 const printTree = (tree: mr.BlockItem[]): string => {
   return tree.map((item) => item.toString()).join("\n");

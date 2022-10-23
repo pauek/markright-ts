@@ -8,8 +8,7 @@
     "esModuleInterop": true,
     "lib": ["es2017"],
     "target": "es2017",
-    "inlineSourceMap": true,
-    "inlineSources": true
+    "sourceMap": true,
   },
   "include": ["src"]
 }
