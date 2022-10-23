@@ -33,28 +33,14 @@ export type ElementChildren = Item[] | string;
 export class Container {
   children: ElementChildren = null;
 
-  childrenToString(ind: string, sep: string): string {
-    if (Array.isArray(this.children)) {
-      return `${this.children.map((it) => it.toString(ind)).join(sep)}`;
-    } else {
-      return `"${this.children}"`;
-    }
+  hasChildren(): boolean {
+    return Array.isArray(this.children) && this.children.length > 0;
   }
 
-  findByName(...nameList: string[]): Array<Item> {
-    const results: Array<Item> = Array(nameList.length);
-    if (!Array.isArray(this.children)) {
-      return results;
-    }
-    for (const child of this.children) {
-      if (child instanceof Element) {
-        const pos = nameList.indexOf(child.name);
-        if (pos !== -1 && results[pos] === undefined) {
-          results[pos] = child;
-        }
-      }
-    }
-    return results;
+  childrenToString(sep: string = ""): string {
+    return Array.isArray(this.children)
+      ? `${this.children.map((it) => it.toString()).join(sep)}`
+      : `"${this.children}"`;
   }
 }
 
@@ -65,21 +51,21 @@ export class Text {
     this.text = text;
   }
 
-  toString(ind: string = "") {
-    return `${ind}"${this.text}"`;
+  toString() {
+    return `Text("${this.text}")`;
   }
 }
 
 export class Paragraph extends Container {
-  children: InlineItem[] = [];
+  children: InlineItem[];
 
   constructor(children: InlineItem[] = []) {
     super();
     this.children = children;
   }
 
-  toString(ind: string = "") {
-    return `${ind}P\n${this.childrenToString(ind + "  ", "\n")}`;
+  toString(): string {
+    return `Paragraph(${this.childrenToString(", ")})`;
   }
 }
 
@@ -88,7 +74,7 @@ export class Element extends Container {
   isRaw: boolean;
   args: string[];
 
-  constructor(name: string, args: string[], isRaw: boolean = false) {
+  constructor(name: string, args: string[] = [], isRaw: boolean = false) {
     super();
     this.name = name;
     this.isRaw = isRaw;
@@ -97,27 +83,27 @@ export class Element extends Container {
 
   toString(): string {
     const hasArgs = Array.isArray(this.args) && this.args.length > 0;
-    const args = hasArgs ? `(${this.args.join(", ")})` : "";
+    const args = hasArgs ? `(${this.args.join(", ")})` : ``;
     return `${this.name}${args}`;
   }
 }
 export class BlockElement extends Element {
   children: BlockItem[] | string = null;
 
-  toString(ind: string = ""): string {
-    return `${ind}B.${super.toString()}\n${this.childrenToString(ind + "  ", "\n")}`;
+  toString(): string {
+    return `Block/${super.toString()}[${this.childrenToString(", ")}]`;
   }
 }
 export class InlineElement extends Element {
   children: InlineItem[] | string = [];
 
-  toString(ind: string = ""): any {
+  toString(): string {
     let children = "";
     if (typeof this.children === "string") {
       children = `"${this.children}"`;
-    } else if (Array.isArray(this.children) && this.children.length > 0) {
-      children = `[${this.childrenToString("", ", ")}]`;
+    } else if (this.hasChildren()) {
+      children = `[${this.childrenToString(", ")}]`;
     }
-    return `${ind}I.${super.toString()}${children}`;
+    return `Inline/${super.toString()}[${children}]`;
   }
 }
