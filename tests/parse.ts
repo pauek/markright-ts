@@ -4,13 +4,18 @@ import * as mr from "../src/markright";
 
 const lines = (lineArray: string[]): string => lineArray.map((line) => line + "\n").join("");
 
-const printTree = (tree: mr.BlockItem[]): string => {
-  return tree.map((item) => item.toString()).join("\n");
+const printTree = (tree: mr.Container): string => {
+  const { children } = tree;
+  if (typeof children === "string") {
+    return children;
+  } else {
+    return children.map((item) => item.toString()).join("\n");
+  }
 };
 
 const parseTest = (input: string[], output: mr.BlockItem[]) => () => {
   const tree = mr.parse(lines(input));
-  assert.is(printTree(tree), printTree(output), "Trees should be equal");
+  assert.is(printTree(tree), printTree(new mr.Container(output)), "Trees should be equal");
 };
 
 const _Paragraph = (...args) => new mr.Paragraph(...args);

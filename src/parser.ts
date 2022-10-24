@@ -1,4 +1,4 @@
-import { Text, Paragraph, InlineItem, InlineElement, BlockElement, BlockItem } from "./model";
+import { Text, Paragraph, InlineItem, InlineElement, BlockElement, BlockItem, Container } from "./model";
 
 const elementStartChar = "@";
 const openDelimiters = "[{(<";
@@ -256,8 +256,12 @@ class Parser {
     maybeEndParagraph();
     return children;
   }
+
+  parse() {
+    return new Container(this.parseBlockItems(0));
+  }
 }
 
-export const parse = (text: string): BlockItem[] => {
-  return new Parser(text).parseBlockItems(0);
+export const parse = (text: string): Container => {
+  return new Parser(text).parse();
 };

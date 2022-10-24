@@ -6,6 +6,8 @@ import {
   InlineElement,
   Text,
   ElementChildren,
+  Container,
+  Item,
 } from "./model";
 
 export const symText: unique symbol = Symbol("Text");
@@ -139,6 +141,12 @@ class Walker {
   }
 }
 
-export const walk = (items: BlockItem[], funcMap: FuncMap) => {
-  return new Walker(funcMap).walkBlockItems(items);
+const isBlockItem = (x: Item) => x instanceof Paragraph || x instanceof BlockElement;
+
+export const walk = (tree: Container, funcMap: FuncMap) => {
+  const { children } = tree;
+  if (!Array.isArray(children) || !children.every(isBlockItem)) {
+    throw "Container with only a string?";
+  }
+  return new Walker(funcMap).walkBlockItems(children as BlockItem[]);
 };

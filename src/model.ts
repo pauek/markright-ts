@@ -33,6 +33,10 @@ export type ElementChildren = Item[] | string;
 export class Container {
   children: ElementChildren = null;
 
+  constructor(children: Item[]) {
+    this.children = children;
+  }
+
   hasChildren(): boolean {
     return Array.isArray(this.children) && this.children.length > 0;
   }
@@ -60,8 +64,7 @@ export class Paragraph extends Container {
   children: InlineItem[];
 
   constructor(children: InlineItem[] = []) {
-    super();
-    this.children = children;
+    super(children);
   }
 
   toString(): string {
@@ -75,7 +78,7 @@ export class Element extends Container {
   args: string[];
 
   constructor(name: string, args: string[] = [], isRaw: boolean = false) {
-    super();
+    super([]);
     this.name = name;
     this.isRaw = isRaw;
     this.args = args;
