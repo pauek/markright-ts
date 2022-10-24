@@ -10,7 +10,11 @@ test("Simple query", () => {
 @person
   @title
     The Duchess
-`)
-  // const title = mr.query(tree, 'title');
-  // assert.is(typeof title, "BlockElement");
+`);
+  const docTitle = tree.query("document title");
+  const personTitle = tree.query("person title");
+  assert.is(docTitle, (tree.children[0] as mr.BlockElement).children[0]);
+  assert.is(personTitle, (tree.children[1] as mr.BlockElement).children[0]);
 });
+
+test.run();

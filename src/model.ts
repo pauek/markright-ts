@@ -46,6 +46,20 @@ export class Container {
       ? `${this.children.map((it) => it.toString()).join(sep)}`
       : `"${this.children}"`;
   }
+
+  query(q: string): Item {
+    const ids = q.split(" ");
+    for (const item of this.children) {
+      if (item instanceof Element && item.name === ids[0]) {
+        if (ids.length > 1) {
+          return item.query(ids.slice(1).join(" "));
+        } else {
+          return item;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 export class Text {
@@ -69,6 +83,12 @@ export class Paragraph extends Container {
 
   toString(): string {
     return `Paragraph(${this.childrenToString(", ")})`;
+  }
+}
+
+export class RootElement extends Container {
+  constructor(children: BlockItem[]) {
+    super(children);
   }
 }
 
