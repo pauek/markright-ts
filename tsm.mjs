@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   common: {
     target: "es2020",
   },
