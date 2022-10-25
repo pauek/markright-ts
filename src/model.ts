@@ -47,6 +47,18 @@ export class Container {
       : `"${this.children}"`;
   }
 
+  get innerText(): string {
+    let text = "";
+    for (const item of this.children) {
+      if (typeof item === "string") {
+        text += item;
+      } else {
+        text += item.innerText;
+      }
+    }
+    return text;
+  }
+
   query(q: string): Item {
     const ids = q.split(" ");
     for (const item of this.children) {
@@ -69,6 +81,10 @@ export class Text {
     this.text = text;
   }
 
+  get innerText(): string {
+    return this.text;
+  }
+
   toString() {
     return `Text("${this.text}")`;
   }
@@ -79,6 +95,14 @@ export class Paragraph extends Container {
 
   constructor(children: InlineItem[] = []) {
     super(children);
+  }
+
+  get innerText() : string {
+    let text = "";
+    for (const item of this.children) {
+      text += item.innerText;
+    }
+    return text;
   }
 
   toString(): string {
