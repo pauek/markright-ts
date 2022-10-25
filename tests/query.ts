@@ -18,4 +18,13 @@ test("Simple query", () => {
   assert.is(docTitle.innerText, "The Tales of Markrightbury");
 });
 
+test("innerText", () => {
+  const tree = mr.parse(`
+@root
+  This @em{text} has some @elements{in @b[it]}
+`);
+  const root = tree.query("root") as mr.BlockElement;
+  assert.equal(root.innerText, "This text has some in it");
+});
+
 test.run();

@@ -37,7 +37,7 @@ export class Container {
     this.children = children;
   }
 
-  hasChildren(): boolean {
+  get hasChildren(): boolean {
     return Array.isArray(this.children) && this.children.length > 0;
   }
 
@@ -97,14 +97,6 @@ export class Paragraph extends Container {
     super(children);
   }
 
-  get innerText() : string {
-    let text = "";
-    for (const item of this.children) {
-      text += item.innerText;
-    }
-    return text;
-  }
-
   toString(): string {
     return `Paragraph(${this.childrenToString(", ")})`;
   }
@@ -142,13 +134,13 @@ export class BlockElement extends Element {
   }
 }
 export class InlineElement extends Element {
-  children: InlineItem[] | string = [];
+  children: InlineItem[] | string = null;
 
   toString(): string {
     let children = "";
     if (typeof this.children === "string") {
       children = `"${this.children}"`;
-    } else if (this.hasChildren()) {
+    } else if (this.hasChildren) {
       children = `[${this.childrenToString(", ")}]`;
     }
     return `Inline/${super.toString()}[${children}]`;

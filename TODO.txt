@@ -15,4 +15,8 @@
        "section(*) title"
     [jerarquía solamente? con los parámetros también?]
        
-
+- FIXME:
+  * No tiene mucho sentido que el parser se enfade cuando
+    pones: `@a{some @b{text} inside}` porque es tan cutre que 
+    solo busca el separador de la forma más simple?
+    Habría que hacerlo más amable!

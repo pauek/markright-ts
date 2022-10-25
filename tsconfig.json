@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "sourceRoot": ".",
     "outDir": "dist",
     "declaration": true,
     "moduleResolution": "node",
