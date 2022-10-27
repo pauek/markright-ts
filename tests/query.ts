@@ -21,10 +21,10 @@ test("Simple query", () => {
 test("innerText", () => {
   const tree = mr.parse(`
 @root
-  This @em{text} has some @elements{in @b[it]}
+  This @em{text} has some @elements{in @b[it]} @br
 `);
   const root = tree.query("root") as mr.BlockElement;
-  assert.equal(root.innerText, "This text has some in it");
+  assert.equal(root.innerText, "This text has some in it ");
 });
 
 test.run();
