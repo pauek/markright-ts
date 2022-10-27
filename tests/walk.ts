@@ -2,7 +2,8 @@ import { test } from "uvu";
 import * as assert from "uvu/assert";
 import * as mr from "../src/markright";
 
-const lines = (lineArray: string[]): string => lineArray.map((line) => line + "\n").join("");
+const lines = (lineArray: string[]): string =>
+  lineArray.map((line) => line + "\n").join("");
 
 test("Walk a text", () => {
   const tree = mr.parse(`hi`);
@@ -103,6 +104,44 @@ test("Object", () => {
       { name: "John", age: 13 },
     ])
   );
+});
+
+const htmlText = `
+@html
+  @head
+    @style*
+      body { margin: 0; }
+  @body
+    @main
+      @section
+        @h1{A classical page}
+        @p
+          Some paragraph
+          with more than one line
+`;
+const htmlResult = `<html>
+<head>
+<style>
+body { margin: 0; }
+
+</style>
+</head>
+<body>
+<main>
+<section>
+<h1>A classical page</h1>
+<p>
+Some paragraph with more than one line
+</p>
+</section>
+</main>
+</body>
+</html>`;
+
+test("HTML 1", () => {
+  const tree = mr.parse(htmlText);
+  const html = mr.walk(tree, mr.htmlFuncMap);
+  assert.is(html[0], htmlResult);
 });
 
 test.run();

@@ -11,5 +11,14 @@ export {
   symText,
 } from "./walk";
 
-export { BlockElement, InlineElement, Container, Element, Paragraph, Text } from "./model";
+export {
+  BlockElement,
+  InlineElement,
+  Container,
+  Element,
+  Paragraph,
+  Text,
+} from "./model";
+
 export type { BlockItem, InlineItem, Item } from "./model";
+export { htmlFuncMap } from "./html";

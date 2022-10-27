@@ -37,7 +37,7 @@ interface BlockChildrenArgs {
   children: BlockItem[];
 }
 
-type FuncMap = {
+export type FuncMap = {
   [name: string]: (params: ElementArgs) => any;
   [symText]?: (params: TextArgs) => any;
   [symBlockElement]?: (params: NameArg & ElementArgs) => any;
