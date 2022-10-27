@@ -36,12 +36,13 @@ test("Double asterisk 2", () => {
   );
 });
 
-test("Double asterisk 2", () => {
-  const tree = mr.parse(`
+const doubleAsteriskText = `
 some paragraph
 in more
 than one line
-`);
+`;
+test("Double asterisk 2", () => {
+  const tree = mr.parse(doubleAsteriskText);
   const result = mr.walk(tree, {
     [mr.symParagraph]: ({ children }) => children.join("<br>\n"),
   });

@@ -25,6 +25,8 @@ BlockElement : Element, BlockItem {
 
 */
 
+import { resolveObjectURL } from "buffer";
+
 export type BlockItem = BlockElement | Paragraph;
 export type InlineItem = InlineElement | Text;
 export type Item = BlockItem | InlineItem;
@@ -71,6 +73,45 @@ export class Container {
       }
     }
     return null;
+  }
+
+  queryAll(q: string): Item[] {
+    if (q === "") {
+      return [this as Item];
+    }
+    const ids = q.split(" ");
+    const qhead = ids[0];
+    const qrest = ids.slice(1).join("");
+
+    const match = (item: Item) => {
+      if (item instanceof Element && item.name === qhead) {
+        return true;
+      } else if (qhead === "<Paragraph>" && item instanceof Paragraph) {
+        return true;
+      } else if (qhead === "<Text>" && item instanceof Text) {
+        return true;
+      } else if (qhead === "<BlockElement>" && item instanceof BlockElement) {
+        return true;
+      } else if (qhead === "<InlineElement>" && item instanceof InlineElement) {
+        return true;
+      }
+      return false;
+    };
+
+    let result: Item[] = [];
+    for (const item of this.children) {
+      if (!(typeof item === "string")) {
+        if (item instanceof Text) {
+          if (match(item)) {
+            result.push(item);
+          }
+        } else {
+          const qnext = match(item) ? qrest : q;
+          result = [...result, ...item.queryAll(qnext)];
+        }
+      }
+    }
+    return result;
   }
 }
 
