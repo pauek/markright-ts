@@ -23,15 +23,15 @@ export const strRepr = (tree: RootElement) => {
     if (item instanceof Text) {
       return `Text("${item.text}")`;
     } else if (item instanceof Paragraph) {
-      return `Paragraph(${childrenRepr(item)})`;
+      return `Paragraph[${childrenRepr(item)}]`;
     } else if (item instanceof RootElement) {
-      return `RootElement(${childrenRepr(item)})`;
+      return `RootElement[${childrenRepr(item)}]`;
     } else if (item instanceof BlockElement) {
       const header = headerRepr(item);
-      return `Block/${header}[${childrenRepr(item)})`;
+      return `Block/${header}[${childrenRepr(item)}]`;
     } else if (item instanceof InlineElement) {
       const header = headerRepr(item);
-      return `Inline/${header}[${childrenRepr(item)})`;
+      return `Inline/${header}[${childrenRepr(item)}]`;
     }
   };
 

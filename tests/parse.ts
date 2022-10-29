@@ -1,26 +1,17 @@
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 import * as mr from "../src/markright";
-import { RootElement } from "../src/model";
 import { strRepr } from "./str-repr";
 
 const lines = (lineArray: string[]): string =>
   lineArray.map((line) => line + "\n").join("");
 
-const printTree = (tree: RootElement): string => {
-  const { children } = tree;
-  if (typeof children === "string") {
-    return children;
-  } else {
-    return strRepr(tree);
-  }
-};
-
 const parseTest = (input: string[], output: mr.BlockItem[]) => () => {
   const tree = mr.parse(lines(input));
+  console.log(strRepr(tree));
   assert.is(
-    printTree(tree),
-    printTree(new mr.Container(output)),
+    strRepr(tree),
+    strRepr(new mr.RootElement(output)),
     "Trees should be equal"
   );
 };

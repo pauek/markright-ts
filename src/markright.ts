@@ -12,6 +12,7 @@ export {
 } from "./walk";
 
 export {
+  RootElement,
   BlockElement,
   InlineElement,
   Container,
