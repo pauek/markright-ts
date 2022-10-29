@@ -12,13 +12,6 @@
     "build": "rimraf ./dist && tsc && rollup -c",
     "test": "uvu -r tsm tests"
   },
-  "exports": {
-    ".": {
-      "import": {
-        "default": "./dist/index.js"
-      }
-    }
-  },
   "devDependencies": {
     "@types/node": "^18.0.0",
     "chalk": "^5.0.1",

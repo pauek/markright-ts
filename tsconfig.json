@@ -8,5 +8,5 @@
     "lib": ["es2017"],
     "target": "es2017"
   },
-  "include": ["src", "tests"]
+  "include": ["src"]
 }

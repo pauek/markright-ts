@@ -6,6 +6,7 @@ import {
   BlockElement,
   Text,
   Paragraph,
+  Item,
 } from "./model";
 
 class Printer {
@@ -40,7 +41,7 @@ class Printer {
     this.indent(-1);
   }
 
-  printHead(elem: Element) {
+  printHead(elem: Element<Item>) {
     const args = elem.args ? `(${elem.args.join(", ")})` : "";
     this.write(`@${elem.name}${args}`);
   }
@@ -65,15 +66,11 @@ class Printer {
 
   printInlineElement(inlineElement: InlineElement) {
     this.printHead(inlineElement);
-    if (inlineElement.children instanceof String) {
-      this.write(inlineElement.children as string);
-    } else {
-      const inlineItems = inlineElement.children as InlineItem[];
-      if (inlineItems.length > 0) {
-        this.write("[");
-        this.printInlineItems(inlineItems);
-        this.write("]");
-      }
+    const inlineItems = inlineElement.children as InlineItem[];
+    if (inlineItems.length > 0) {
+      this.write("[");
+      this.printInlineItems(inlineItems);
+      this.write("]");
     }
   }
 
