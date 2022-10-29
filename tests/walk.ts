@@ -16,7 +16,7 @@ test("Walk a text", () => {
 test("Double asterisk 1", () => {
   const tree = mr.parse(`hola     @elm{que}    tal`);
   const result = mr.walk(tree, {
-    ["elm"]: ({ children }) => `**${children as string}**`,
+    ["elm"]: ({ children }) => `**${children}**`,
   });
   assert.is(result[0], "hola **que** tal");
 });
@@ -29,7 +29,7 @@ test("Double asterisk 2", () => {
   some other content
 `);
   const result = mr.walk(tree, {
-    ["elm"]: ({ children }) => `**${children as string}**`,
+    ["elm"]: ({ children }) => `**${children}**`,
   });
   assert.is(
     result.map((item) => item + "\n").join(""),

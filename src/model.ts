@@ -25,17 +25,14 @@ BlockElement : Element, BlockItem {
 
 */
 
-import { resolveObjectURL } from "buffer";
-
 export type BlockItem = BlockElement | Paragraph;
 export type InlineItem = InlineElement | Text;
 export type Item = BlockItem | InlineItem;
-export type ElementChildren = Item[] | string;
 
-export class Container {
-  children: ElementChildren = null;
+export class Container<T extends Item> {
+  children: T[] = null;
 
-  constructor(children: Item[]) {
+  constructor(children: T[]) {
     this.children = children;
   }
 
@@ -131,8 +128,7 @@ export class Text {
   }
 }
 
-export class Paragraph extends Container {
-  children: InlineItem[];
+export class Paragraph extends Container<InlineItem> {
 
   constructor(children: InlineItem[] = []) {
     super(children);
@@ -143,13 +139,14 @@ export class Paragraph extends Container {
   }
 }
 
-export class RootElement extends Container {
+export class RootElement extends Container<BlockItem> {
+
   constructor(children: BlockItem[]) {
     super(children);
   }
 }
 
-export class Element extends Container {
+export class Element<T extends Item> extends Container<T> {
   name: string;
   isRaw: boolean;
   args: string[];
@@ -167,16 +164,12 @@ export class Element extends Container {
     return `${this.name}${args}`;
   }
 }
-export class BlockElement extends Element {
-  children: BlockItem[] | string = null;
-
+export class BlockElement extends Element<BlockItem> {
   toString(): string {
     return `Block/${super.toString()}[${this.childrenToString(", ")}]`;
   }
 }
-export class InlineElement extends Element {
-  children: InlineItem[] | string = null;
-
+export class InlineElement extends Element<InlineItem> {
   toString(): string {
     let children = "";
     if (typeof this.children === "string") {

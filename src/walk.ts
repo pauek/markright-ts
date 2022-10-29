@@ -5,9 +5,9 @@ import {
   Paragraph,
   InlineElement,
   Text,
-  ElementChildren,
   Container,
   Item,
+  RootElement,
 } from "./model";
 
 export const symText: unique symbol = Symbol("Text");
@@ -22,7 +22,7 @@ interface NameArg {
 }
 interface ElementArgs {
   args: string[];
-  children: ElementChildren;
+  children: Item[];
 }
 
 interface TextArgs {
@@ -139,14 +139,19 @@ class Walker {
     const func = this.funcMap[symBlockChildren];
     return func ? func({ children }) : children;
   }
+
+  walkRootElement(element: RootElement) {
+    return this.walkBlockItems(element.children);
+  }
 }
 
-const isBlockItem = (x: Item) => x instanceof Paragraph || x instanceof BlockElement;
-
-export const walk = (tree: Container, funcMap: FuncMap) => {
-  const { children } = tree;
-  if (!Array.isArray(children) || !children.every(isBlockItem)) {
-    throw "Container with only a string?";
+export const walk = (tree: RootElement | BlockElement | InlineElement, funcMap: FuncMap) => {
+  const walker = new Walker(funcMap);
+  if (tree instanceof RootElement) {
+    return walker.walkRootElement(tree);
+  } else if (tree instanceof BlockElement) {
+    return walker.walkBlockElement(tree);
+  } else if (tree instanceof InlineElement) {
+    return walker.walkInlineElement(tree);
   }
-  return new Walker(funcMap).walkBlockItems(children as BlockItem[]);
 };
