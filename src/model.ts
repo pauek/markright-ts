@@ -125,7 +125,7 @@ export class Paragraph extends Container<InlineItem> {
 }
 
 export class RootElement extends Container<BlockItem> {
-  constructor(children: BlockItem[]) {
+  constructor(children: BlockItem[] = []) {
     super(children);
   }
 }
