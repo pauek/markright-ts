@@ -107,19 +107,19 @@ test("Object", () => {
 });
 
 const htmlText = `
-@html
+@html(lang="en")
   @head
     @style*
       body { margin: 0; }
   @body
     @main
-      @section
+      @section(class="first")
         @h1{A classical page}
         @p
           Some paragraph
           with more than one line
 `;
-const htmlResult = `<html>
+const htmlResult = `<html lang="en">
 <head>
 <style>
 body { margin: 0; }
@@ -128,7 +128,7 @@ body { margin: 0; }
 </head>
 <body>
 <main>
-<section>
+<section class="first">
 <h1>A classical page</h1>
 <p>
 Some paragraph with more than one line
