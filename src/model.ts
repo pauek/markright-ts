@@ -77,9 +77,9 @@ export class Container<T extends Item> {
     const match = (item: Item) => {
       if (item instanceof Element && item.name === qhead) {
         return true;
-      } else if (qhead === "<Paragraph>" && item instanceof Paragraph) {
-        return true;
       } else if (qhead === "<Text>" && item instanceof Text) {
+        return true;
+      } else if (qhead === "<Paragraph>" && item instanceof Paragraph) {
         return true;
       } else if (qhead === "<BlockElement>" && item instanceof BlockElement) {
         return true;
