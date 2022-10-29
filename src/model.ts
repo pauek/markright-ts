@@ -40,12 +40,6 @@ export class Container<T extends Item> {
     return Array.isArray(this.children) && this.children.length > 0;
   }
 
-  childrenToString(sep: string = ""): string {
-    return Array.isArray(this.children)
-      ? `${this.children.map((it) => it.toString()).join(sep)}`
-      : `"${this.children}"`;
-  }
-
   get innerText(): string {
     let text = "";
     for (const item of this.children) {
@@ -122,25 +116,15 @@ export class Text {
   get innerText(): string {
     return this.text;
   }
-
-  toString() {
-    return `Text("${this.text}")`;
-  }
 }
 
 export class Paragraph extends Container<InlineItem> {
-
   constructor(children: InlineItem[] = []) {
     super(children);
-  }
-
-  toString(): string {
-    return `Paragraph(${this.childrenToString(", ")})`;
   }
 }
 
 export class RootElement extends Container<BlockItem> {
-
   constructor(children: BlockItem[]) {
     super(children);
   }
@@ -157,26 +141,6 @@ export class Element<T extends Item> extends Container<T> {
     this.isRaw = isRaw;
     this.args = args;
   }
-
-  toString(): string {
-    const hasArgs = Array.isArray(this.args) && this.args.length > 0;
-    const args = hasArgs ? `(${this.args.join(", ")})` : ``;
-    return `${this.name}${args}`;
-  }
 }
-export class BlockElement extends Element<BlockItem> {
-  toString(): string {
-    return `Block/${super.toString()}[${this.childrenToString(", ")}]`;
-  }
-}
-export class InlineElement extends Element<InlineItem> {
-  toString(): string {
-    let children = "";
-    if (typeof this.children === "string") {
-      children = `"${this.children}"`;
-    } else if (this.hasChildren) {
-      children = `[${this.childrenToString(", ")}]`;
-    }
-    return `Inline/${super.toString()}[${children}]`;
-  }
-}
+export class BlockElement extends Element<BlockItem> {}
+export class InlineElement extends Element<InlineItem> {}

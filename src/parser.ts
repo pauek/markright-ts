@@ -1,4 +1,13 @@
-import { Text, Paragraph, InlineItem, InlineElement, BlockElement, BlockItem, Container, RootElement } from "./model";
+import {
+  Text,
+  Paragraph,
+  InlineItem,
+  InlineElement,
+  BlockElement,
+  BlockItem,
+  Container,
+  RootElement,
+} from "./model";
 
 const elementStartChar = "@";
 const openDelimiters = "[{(<";
@@ -26,7 +35,8 @@ const parseSymbol = (name: string): Symbol => {
   return { isRaw, name: cleanName };
 };
 
-const matchDelim = (delim: string): string => closeDelimiters[openDelimiters.indexOf(delim)];
+const matchDelim = (delim: string): string =>
+  closeDelimiters[openDelimiters.indexOf(delim)];
 
 // Parser
 
@@ -159,7 +169,7 @@ class Parser {
         const sym = parseSymbol(head.name);
 
         const inlineElement = new InlineElement(sym.name, head.args, sym.isRaw);
-        inlineElement.children = sym.isRaw ? body.text : this.parseLine(body.text);
+        inlineElement.children = this.parseLine(body.text);
         items.push(inlineElement);
 
         i = body.end;
@@ -174,7 +184,11 @@ class Parser {
     return items;
   }
 
-  parseBlockRawText(baseIndent: number, name: string, args: string[] = null): string {
+  parseBlockRawText(
+    baseIndent: number,
+    name: string,
+    args: string[] = null
+  ): string {
     let result: string = "";
     let pendingEndl: boolean = false;
     while (this.curr < this.lines.length) {
@@ -216,7 +230,8 @@ class Parser {
 
     while (this.curr < this.lines.length) {
       const line = this.lines[this.curr];
-      const nextLine = this.curr + 1 < this.lines.length ? this.lines[this.curr + 1] : null;
+      const nextLine =
+        this.curr + 1 < this.lines.length ? this.lines[this.curr + 1] : null;
 
       if (isEmptyLine(line)) {
         maybeEndParagraph();
@@ -229,8 +244,10 @@ class Parser {
         break;
       }
 
-      const atElement = line.text[0] === elementStartChar && line.indent == baseIndent;
-      const atBlockElement = atElement && nextLine && nextLine.indent > line.indent;
+      const atElement =
+        line.text[0] === elementStartChar && line.indent == baseIndent;
+      const atBlockElement =
+        atElement && nextLine && nextLine.indent > line.indent;
 
       if (atBlockElement) {
         maybeEndParagraph();
@@ -239,7 +256,11 @@ class Parser {
         const sym = parseSymbol(origName);
         if (sym.isRaw) {
           const blockRawElement = new BlockElement(sym.name, args, true);
-          blockRawElement.children = this.parseBlockRawText(line.indent + 2, sym.name, args);
+          blockRawElement.children = [
+            new Paragraph([
+              new Text(this.parseBlockRawText(line.indent + 2, sym.name, args)),
+            ]),
+          ];
           children.push(blockRawElement);
         } else {
           const blockElement = new BlockElement(sym.name, args);

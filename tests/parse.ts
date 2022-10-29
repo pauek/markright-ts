@@ -1,21 +1,28 @@
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 import * as mr from "../src/markright";
+import { RootElement } from "../src/model";
+import { strRepr } from "./str-repr";
 
-const lines = (lineArray: string[]): string => lineArray.map((line) => line + "\n").join("");
+const lines = (lineArray: string[]): string =>
+  lineArray.map((line) => line + "\n").join("");
 
-const printTree = (tree: mr.Container): string => {
+const printTree = (tree: RootElement): string => {
   const { children } = tree;
   if (typeof children === "string") {
     return children;
   } else {
-    return children.map((item) => item.toString()).join("\n");
+    return strRepr(tree);
   }
 };
 
 const parseTest = (input: string[], output: mr.BlockItem[]) => () => {
   const tree = mr.parse(lines(input));
-  assert.is(printTree(tree), printTree(new mr.Container(output)), "Trees should be equal");
+  assert.is(
+    printTree(tree),
+    printTree(new mr.Container(output)),
+    "Trees should be equal"
+  );
 };
 
 const _Paragraph = (...args) => new mr.Paragraph(...args);
@@ -36,7 +43,7 @@ const _B = (
   name: string,
   args: string[] = [],
   isRaw: boolean = false,
-  children: mr.BlockItem[] | string
+  children: mr.BlockItem[]
 ) => {
   const result = new mr.BlockElement(name, args, isRaw);
   result.children = children;
@@ -172,7 +179,9 @@ test("Indentation in inner text", parseTest(
     "  @3rd"
   ],
   [
-    _B("command", [], true, "1st@@b@@c\n  2nd @z\n@3rd\n")
+    _B("command", [], true, [
+      _Paragraph([_Text("1st@@b@@c\n  2nd @z\n@3rd\n")]),
+    ])
   ]
 ));
 
@@ -267,14 +276,20 @@ test("C++ hello world", parseTest(
     "  }",
   ],
   [
-    _B("code", [], true, lines([
-      "#include<iostream>",
-      "using namespace std;",
-      "",
-      "int main() {",
-      "  cout << \"hi\" << endl;",
-      "}",
-    ])),
+    _B("code", [], true, [
+      _Paragraph([
+        _Text(
+          lines([
+            "#include<iostream>",
+            "using namespace std;",
+            "",
+            "int main() {",
+            "  cout << \"hi\" << endl;",
+            "}",
+          ])
+        )
+      ]),
+    ]),
   ]
 ))
 
