@@ -144,3 +144,4 @@ export class Element<T extends Item> extends Container<T> {
 }
 export class BlockElement extends Element<BlockItem> {}
 export class InlineElement extends Element<InlineItem> {}
+export type AnyElement = BlockElement | InlineElement;

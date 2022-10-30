@@ -3,6 +3,7 @@ export {
   RootElement,
   BlockElement,
   InlineElement,
+  AnyElement,
   Container,
   Element,
   Paragraph,
