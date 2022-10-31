@@ -13,6 +13,7 @@ export {
 export type { FuncMap } from "./walk";
 export {
   walk,
+  walkChildren,
   symBlockChildren,
   symBlockElement,
   symInlineChildren,

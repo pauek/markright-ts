@@ -155,3 +155,17 @@ export const walk = (tree: RootElement | BlockElement | InlineElement, funcMap: 
     return walker.walkInlineElement(tree);
   }
 };
+
+export const walkChildren = (
+  tree: RootElement | BlockElement | InlineElement,
+  funcMap: FuncMap
+) => {
+  const walker = new Walker(funcMap);
+  if (tree instanceof RootElement) {
+    return walker.walkBlockItems(tree.children);
+  } else if (tree instanceof BlockElement) {
+    return walker.walkBlockItems(tree.children);
+  } else if (tree instanceof InlineElement) {
+    return walker.walkInlineItems(tree.children);
+  }
+};
